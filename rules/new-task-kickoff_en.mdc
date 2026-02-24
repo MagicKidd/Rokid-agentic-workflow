@@ -1,0 +1,457 @@
+---
+description: New task kickoff protocol - Phase 1-4 context gathering, design thinking, path selection, AI autonomous execution chain, model allocation strategy, and lessons learned. Loaded by new-task-trigger.mdc.
+alwaysApply: false
+---
+
+# New Task Kickoff Protocol (Meta-Rule)
+
+## Core Principles
+
+```text
+Design Phase = Human-driven (AI prepares context, human decides direction)
+Implementation Phase = AI-driven (After approach confirmation, AI autonomously utilizes Skills chain for efficient execution)
+```
+
+This rule covers the complete initial process from task kickoff to implementation handover. Once the user confirms the plan, AI automatically connects to the Superpowers workflow chain, fully leveraging existing Skills for efficient execution.
+
+---
+
+## Phase 1: Automatic Context Gathering (AI Executes, Human Waits)
+
+Upon detecting a new task, **MUST** execute the following context gathering. 1.0 is environment sniffing, and 1.1-1.6 should ideally use the Task tool to dispatch explore subagents for parallel searching.
+
+### 1.0 Project-Specific Plugin Hook
+
+```yaml
+Sniff path: .cursor/rules/*-playbook.mdc, .cursor/rules/project-context.mdc, or config docs in project root
+Goal: Retrieve project-specific architecture, module abbreviations, custom path mappings, and required plugins
+Effect: 
+  - If found, read immediately and use its "custom conventions" to overwrite the default search strategies for 1.2 (docs) and 1.4 (code).
+  - Read `required_plugins` / dependency declarations, prompting the user or auto-installing missing Cursor Plugins / MCP Servers.
+  - Extract project-specific rule relationships (dynamically replacing the "Relationships with Core Rules" below).
+  - Enables seamless bridging of generic workflows with project-specific depth.
+```
+
+### 1.1 Past Conversation Search
+
+```yaml
+Search path: agent-transcripts/ directory
+Method: Grep task keywords in .jsonl and .txt files
+Goal: Find past conversations related to the current task, extract key decisions and context
+Sorting: Sort by match count descending, read TOP 3 most relevant deeply
+Output: 3 most relevant conversation UUIDs + core summaries (using [Title](uuid) format)
+```
+
+### 1.2 Related Document Matching
+
+```yaml
+Search path: Project documentation directories (e.g. Docs/, docs/, doc/, prioritizing architecture/design directories)
+Method: Match filenames and content by task keywords
+Key directories:
+  - Task descriptions, schedules, design docs
+  - Architecture design docs
+  - Core feature/module design docs
+Output: List of related doc paths + one-sentence summary for each
+```
+
+### 1.3 Existing Rules Check
+
+```yaml
+Search path: .cursor/rules/*.mdc
+Goal: Check for dedicated business or technical rules for the task
+Existing rules list: Dynamically read and list all .mdc files in the project
+Output: Match found? If yes, read content as context
+```
+
+### 1.4 Code Dependency Analysis
+
+```yaml
+Search path: Source code directories (e.g. src/, app/, lib/)
+Method: Identify project structure first, then search code files by involved module names
+Key directories:
+  - Core business logic (auto-detected based on project type)
+  - Interfaces/Configs (auto-detected)
+  - Test frameworks (e.g. tests/, spec/)
+Output: Involved core modules, file paths, key interfaces
+```
+
+### 1.5 Recent Changes Check
+
+```bash
+git log --oneline -20
+git diff --stat HEAD~5
+# Goal: Understand recent development dynamics to avoid conflicts or duplicate work
+```
+
+### 1.6 Dual-Layer Lessons Learned Check
+
+```yaml
+Search path: 
+  - Global: ~/.cursor/skills/_global_lessons.md (Cross-project generic lessons)
+  - Local: lessons.md in the project (e.g. docs/lessons.md or .cursor/lessons.md, project-specific pitfalls)
+Goal: Load historical lessons to avoid repeating mistakes
+Action:
+  - Check the two files above; if they exist, read them fully
+  - Merge into a "Lessons Learned" section to present in Phase 2 (label as global or local)
+  - If missing → skip (auto-create on first trigger)
+Trigger tracking: When the user corrects an AI mistake, AI must verify if it's a "global rule" or "project-specific pitfall", then append it to the corresponding lessons.md in this format:
+```
+
+```markdown
+### YYYY-MM-DD: One-sentence lesson title
+
+- **Scenario**: [What task the error occurred in]
+- **Mistake**: [What the AI did wrong]
+- **Correct Approach**: [How it should be done]
+- **Root Cause**: [Why the mistake happened]
+```
+
+### Gathering Verification
+
+After Phase 1, AI must self-verify:
+
+- [ ] Plugin Hooks: Checked, project-level playbook/context config exists?
+- [ ] Past Conversations: Searched, result is ___
+- [ ] Document Matching: Searched, found ___ docs
+- [ ] Rules Check: Searched, matched ___
+- [ ] Code Analysis: Searched, ___ modules involved
+- [ ] Recent Changes: Searched, ___ recent commits
+- [ ] Lessons Learned: Searched, ___ relevant lessons
+
+**Any item showing "Unsearched" MUST be completed. Skipping is forbidden.**
+
+---
+
+## Phase 2: Context Summary Presentation (AI Presents, Human Reviews)
+
+After gathering, AI **MUST** present a summary to the user in this structured format:
+
+```markdown
+## Task Context Summary
+
+### Task Understanding
+> [One paragraph summarizing the understanding of the task]
+
+### Background Info
+- [Key background extracted from docs/conversations, with links]
+
+### Existing Design Decisions
+| Document | Core Conclusion | Status |
+|----------|-----------------|--------|
+| [Path]   | [One sentence]  | [Done/WIP/TBD] |
+
+### Code Dependencies
+| Module | Path | Relationship |
+|--------|------|--------------|
+| [Name] | [Path]| [Depends on/Depended by/To modify] |
+
+### Existing Rules
+- [Any .mdc rules?] → [If yes, explain content]
+
+### Past Conversations
+- [Title](UUID) - [Core summary]
+
+### Pending Confirmations
+1. [Questions or assumptions for the user to confirm]
+```
+
+---
+
+## Phase 3: Requirements Confirmation (Human Decision)
+
+After presenting the summary, **wait for user confirmation**:
+
+1. Is the task understanding accurate?
+2. Clarify pending items one by one.
+3. User decides the next direction.
+
+**AI only answers questions and provides info here. Do NOT push forward proactively.**
+
+---
+
+## Phase 4: Path Selection and Execution Handover
+
+### Phase 4a: Recommendation Menu (Human Selection)
+
+Based on task nature, recommend to the user:
+
+```text
+Plan confirmed. Recommended paths:
+
+A) Deep Design → 'brainstorming' to discuss and confirm section by section
+B) Clear Plan → 'writing-plans' to break down implementation steps
+C) Simple & Clear → Execute directly
+D) Debug/Troubleshoot → 'systematic-debugging' for structured triage
+E) You think about it first → I will stand by
+
+What do you say?
+```
+
+### Phase 4b: State Transition Protocol (Confirmation Signals)
+
+**Conditions for AI to enter autonomous execution**:
+
+```text
+Explicit confirmation (Execute immediately):
+  - "Choose B" / "Go with B" / "B" + no extra conditions
+  - "Let's start" / "Execute" / "Go"
+  - "Do as you suggested"
+
+Conditional confirmation (Record constraints then execute):
+  - "Choose B, but don't touch intent module yet" → Record as execution constraint
+  - "A, focus on translation model selection" → Record as brainstorming focus
+
+Not a confirmation (Keep waiting):
+  - "Hmm" / "Makes sense" / "Let me see" → Shows understanding, not a command
+  - "Let me think" / "I need to consider" → Clearly undecided
+```
+
+**Temporary Task Interruption Protocol (Anti-pollution mechanism)**:
+If the system is waiting in Phase 2, 3, or 4 and the user inputs a specific task unrelated to the kickoff (e.g., "Check this log", "Explain this function"):
+
+1. **NEVER abort main flow**: Main agent must not drop the current new task context.
+2. **Dispatch Subagent (Inherit without pollution)**:
+   - Use `Task` tool to dispatch a subagent for the temp task.
+   - **Inherit context**: Pass a 1-sentence background in the subagent `prompt` (e.g. "Context: We are designing [Task]. Temp task: [User request]").
+   - **No main line pollution**: Require subagent to return only the core conclusion (< 50 words), or write details to a temp file.
+3. **Force Topic Pull-back**: In the same response, after showing the subagent's result, the main agent MUST **repeat exactly** the multiple-choice or question it was waiting on.
+
+*Template*:
+"I have dispatched a subagent to investigate [Temp task]. Its core conclusion: [One sentence].
+Back to the main track: what are your thoughts on the plan? A or B?"
+
+**If unsure, ask**: `"Are you confirming path X to start execution, or still considering?"`
+
+**Path A (brainstorming) Exit Signals**:
+- User says "Plan is set" / "That's it" / "Let's start" → Auto-transition to Path B
+- User says "Stop here for now" / "Let me think" → Pause, record design progress
+- After producing the design doc, AI prompts: "Design doc saved. Enter implementation planning (Path B)?"
+
+**Mid-way Pause Protocol**:
+- User says "Wait" / "Pause" / "Stop" → Stop immediately, report current progress
+- User says "Wrong direction" → Fallback to Phase 4a to re-select
+
+### Phase 4c: AI Autonomous Execution Chain (Auto-advance after confirmation)
+
+Upon confirmation, AI **autonomously connects the workflow chain** without asking permission step-by-step:
+
+```text
+User confirms plan
+  │
+  ├─ Path A (Deep Design):
+  │   brainstorming → Design doc → User confirms → Enter Path B
+  │
+  ├─ Path B (Implementation Plan):
+  │   writing-plans break down tasks
+  │     → [If LLM involved] Load prompt-engineering
+  │     → [If Frontend involved] Load frontend-design
+  │     → test-driven-development (Write tests first)
+  │     → subagent-driven-development (Parallel execution)
+  │     → requesting-code-review after each batch
+  │     → verification-before-completion
+  │     → finishing-a-development-branch (Wrap up)
+  │
+  ├─ Path C (Direct Execution):
+  │   Direct coding
+  │     → verification-before-completion
+  │     → Report results
+  │
+  └─ Path D (Debug/Troubleshoot):
+      systematic-debugging (4 phases)
+        → Phase 1 Root cause → Phase 2 Pattern analysis
+        → Phase 3 Hypothesis test → Phase 4 Implement fix
+        → verification-before-completion
+```
+
+### Constraints for AI Autonomous Execution
+
+During autonomous advancement, AI obeys:
+
+1. **Must have verification evidence before claiming completion** — Run tests/check outputs first.
+2. **Report immediately when blocked** — No guessing, no bypassing. Stop and ask the user.
+3. **Brief report after major steps** — 1-sentence progress update; can proceed without user reply.
+4. **Re-plan after 3 failed fix attempts** — Don't just halt; try to break down the approach differently first. If the new plan is rejected, then halt for human decision.
+5. **User constraints always apply** — Conditions recorded in Phase 4b are respected throughout.
+6. **Self-review before non-trivial changes** — After complex implementation, ask "Is there a simpler way?" before review. Skip for trivial edits.
+7. **Dual-layer lesson recording** — When corrected, confirm with user and record in global `_global_lessons.md` or local `lessons.md` to prevent repetition.
+8. **Lesson triage & archiving** — If any lessons.md exceeds 20 items, proactively suggest grouping similarities or moving internalized lessons to `lessons_archive.md` to keep memory lean.
+
+---
+
+## Model Allocation Strategy (Cost Optimization)
+
+### Core Principles
+
+```text
+Divide labor by cognitive type, not just price tiers:
+  T1 Reasoning Models = "Thinking" tasks: design, planning, review, judging verification
+  T2 Coding Models    = "Writing" tasks: programming, test implementation
+  T3 Understanding    = "Reading" tasks: document comprehension, multimodal analysis
+  T4 Fast Models      = "Running" tasks: search, git, file ops
+```
+
+### Auto-Downgrade (AI Executed)
+
+In subagent tasks, **MUST** use `model="fast"` for:
+- Phase 1 all context searches (grep, glob, git commands)
+- Phase 4c mechanical tasks (git ops, running test commands, copying files)
+
+### Manual Switch Prompts (AI MUST Prompt User)
+
+When entering these stages, AI **MUST** remind the user to consider switching models:
+
+```text
+Entering dense coding/testing:
+  "Next is dense coding. Consider switching to a faster coding model to save costs.
+   We will return to the strongest reasoning model for code review afterward. Switch now?"
+
+Coding finished, entering review:
+  "Coding is done. Moving to code review and verification.
+   Consider switching back to the strongest reasoning model for deep judgment. Switch now?"
+```
+
+### Model-Task Mapping Cheat Sheet
+
+| Task Phase | Recommended Tier | Switch Method | Reason |
+|------------|------------------|---------------|--------|
+| Phase 1 Context Gathering | Fast | Auto (Subagent) | Search & match, no reasoning |
+| Phase 2 Summary Gen | Reasoning | Keep Main | Synthesis & judgment |
+| Phase 3 Confirmation | Reasoning | Keep Main | Understanding ambiguous intent |
+| Phase 4a Path Selection| Reasoning | Keep Main | Architectural decision |
+| Phase 4c Plan Breakdown| Reasoning | Keep Main | Requires architectural thinking|
+| Phase 4c Dense Coding | Coding | **Prompt Manual Switch** | High code generation efficiency|
+| Phase 4c Code Review | Reasoning | **Prompt Switch Back** | Deep judgment |
+| Phase 4c Verification | Reasoning | **Prompt Switch Back** | Result analysis |
+| Phase 4c Commands/Git | Fast | Auto (Subagent) | Mechanical execution |
+
+---
+
+## Path Conventions
+
+Recommended path conventions (if project has specific norms, they override these defaults):
+
+| Doc Type | Recommended Path | Naming Convention |
+|----------|------------------|-------------------|
+| Design | `docs/design/` | `YYYY-MM-DD-<name>-design.md` |
+| Plan | `docs/plans/` | `YYYY-MM-DD-<name>-plan.md` |
+| Test Report | `docs/reports/` | `<module>_test_report.md` |
+| Task Rule | `.cursor/rules/` | `<task-name>.mdc` |
+
+---
+
+## Relationships with Core Rules
+
+| Rule | Relationship | Description |
+|------|--------------|-------------|
+| `new-task-trigger.mdc` | Upstream | Loads this protocol upon detecting signal |
+| `[plugin]-playbook.mdc` | Sideload | Dictates project-specific constraints (plugins, paths) |
+| *(Dynamic business rules)* | Discoverable | Specific task rules dynamically retrieved in Phase 1.3 |
+
+## Skills Complete Index
+
+### Workflow Skills (Superpowers Chain)
+
+| Scenario | Skill | Phase | Driver |
+|----------|-------|-------|--------|
+| Deep design discussion | `brainstorming` | Phase 4a Path A | Human |
+| Implementation planning | `writing-plans` | Phase 4c Path B | AI |
+| Parallel task execution | `subagent-driven-development`| Phase 4c WIP | AI |
+| Batch plan execution | `executing-plans` | Phase 4c WIP | AI |
+| Code review | `requesting-code-review` | Phase 4c Post-batch| AI |
+| Completion verification | `verification-before-completion`| Phase 4c Pre-finish| AI |
+| Branch wrap-up | `finishing-a-development-branch`| Phase 4c Finished| AI |
+| Systematic debugging | `systematic-debugging` | Phase 4c Path D | AI |
+| Architecture guidance | `software-architecture` | Phase 4a Arch | Human |
+| Complex file planning | `planning-with-files` | Phase 4c (>5 tasks) | AI |
+| Parallel independent bugs| `dispatching-parallel-agents` | Phase 4c Multiple | AI |
+
+### Domain Skills (Auto-loaded by Task Features)
+
+When AI detects these features in the execution chain, **Auto-load corresponding Skill**:
+
+| Feature Detected | Load Skill | Description |
+|------------------|------------|-------------|
+| Prompt design/optimization | `prompt-engineering` | Prompt work for experts, routing, etc. |
+| Coding implementation | `test-driven-development`| Write tests first, Red-Green-Refactor |
+| Frontend/UI pages | `frontend-design` | Production-grade UI (HTML/React/Vue) |
+| Refactoring/Continuous imp.| `kaizen` | Avoid over-engineering, Poka-Yoke |
+| New project/module docs | `project-documentation`| README, Dev guides, Arch docs |
+
+### Design Enhancement Skills (Called on-demand in Phase 3/4a)
+
+| Scenario | Skill | Trigger Condition |
+|----------|-------|-------------------|
+| Design disagreements | `expert-debate` | Conflicting options between User/AI |
+| Multi-domain perspective | `expert-collaboration` | Task spans product+tech+UX domains |
+| Deep understanding needed| `internalized-cognition` | Needs "becoming the system" for insight |
+
+---
+
+## Example Scenarios (Generic Walkthrough)
+
+### Scenario 1: User says "Start refactoring the product details page"
+
+```text
+Phase 1 Gathering (AI Parallel Exec):
+  - Plugin Sniff: Detected .cursor/rules/ecommerce-playbook.mdc, read paths & constraints
+  - Past Convos: Searched "product details" → 4 related found
+  - Related Docs: docs/design/product_page_design.md §2.1
+  - Existing Rules: p1-frontend-components.mdc matched
+  - Code Deps: src/components/Product/ modules
+  - Recent Changes: git log relevant commits
+
+Phase 2 Summary (AI Presents):
+  → Structured summary, referencing design doc §2.1
+
+Phase 3 Confirmation (Human Decision):
+  → User confirms: "Do the core purchase button area first"
+
+Phase 4a (Human Selection): Path A - Deep design needed
+Phase 4b (State Transition): User: "A, let's discuss button states" → Conditional
+Phase 4c (AI drives brainstorming, human drives discussion):
+  → brainstorming discusses OutOfStock, Preorder, Normal states
+  → Frontend detected → Auto-load frontend-design
+  → User: "Plan is set" → brainstorming exit signal
+  → AI: "Enter Path B?" → User: "Yes" → Enter 4c chain
+  → Load p1-frontend-components.mdc and execute
+```
+
+### Scenario 2: User says "Continue last time's payment module debugging"
+
+```text
+Phase 1 Gathering (AI Parallel Exec):
+  - Past Convos: Found last Stripe Webhook signature triage progress
+  - Existing Rules: payment-security.mdc matched
+
+Phase 2 Summary (AI Presents):
+  → Last progress, pending items, test conclusions
+
+Phase 3 Confirmation (Human Decision):
+  → User confirms: "Continue from the signature 401 error"
+
+Phase 4a (Human Selection): Path D - Debug/Troubleshoot
+Phase 4b (State Transition): User: "D, check like last time" → Confirmed
+Phase 4c (AI Autonomous Execution):
+  → Load payment-security.mdc
+  → systematic-debugging (4 phases)
+  → verification-before-completion
+  → Report test conclusions
+```
+
+### Scenario 3: User says "Add a report export feature"
+
+```text
+Phase 1-3 (Human Driven):
+  → Gather data structure docs, existing report code
+  → User confirms requirements and constraints
+
+Phase 4a (Human Selection): Path B - Clear plan, need execution
+Phase 4b (State Transition): User: "B, go" → Confirmed
+Phase 4c (AI Autonomous Chain):
+  → writing-plans breaks it into 8 bite-sized tasks
+  → test-driven-development writes generation logic tests first
+  → subagent-driven-development executes in parallel
+  → requesting-code-review after every 3 tasks
+  → verification-before-completion for the whole suite
+  → finishing-a-development-branch commits/PRs
+```
