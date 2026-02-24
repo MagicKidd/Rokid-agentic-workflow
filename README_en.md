@@ -27,6 +27,7 @@ In everyday engineering practices, the team (Jing, et al.) noticed that when usi
 ## 💡 Core Concepts
 
 - **Mitigating Context Loss**: Through automated information retrieval (Phase 1), the AI scans related code, architectural documents, and past troubleshooting records right at the beginning of the conversation to establish a solid baseline.
+- **Auto-Learning Project Conventions**: Bundled dynamic context scripts allow AI to distill naming, typing, logging, and error-handling patterns directly from your codebase, turning them into actionable rules to prevent generating inconsistent "slop" code.
 - **Enforcing Engineering Discipline**: "Decision points" (Phase 2 & 3) are introduced before any code is written. Only after the approach is confirmed by the human will the AI be authorized to load professional skills like TDD or multi-step planning (Phase 4) for standardized development.
 - **Verification First**: The AI is strictly required to provide evidence of passing tests or successful execution before claiming a defect is fixed or a task is completed.
 
@@ -60,6 +61,7 @@ Cursor natively supports reading `.mdc` rules from the `.cursor/rules` directory
 ```bash
 mkdir -p .cursor/rules
 # Use symlinks to easily keep your workflow updated across projects
+ln -s ~/.cursor/skills/en/rules/ai-coding-protocol.mdc .cursor/rules/
 ln -s ~/.cursor/skills/en/rules/new-task-trigger.mdc .cursor/rules/
 ln -s ~/.cursor/skills/en/rules/new-task-kickoff.mdc .cursor/rules/
 ```

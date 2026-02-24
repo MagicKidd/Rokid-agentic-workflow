@@ -27,6 +27,7 @@
 ## 💡 核心思路
 
 - **应对上下文丢失**：通过自动化信息采集（Phase 1），在对话之初检索关联代码、架构文档和历史避坑记录，确保基线信息完整。
+- **自动学习项目规范**：通过配套的动态上下文脚本，让 AI 从真实代码库中提炼（Naming、Type hints、Logging、Error handling）等规范，生成项目级可执行约定，拒绝“瞎糊代码”。
 - **引入工程纪律**：在编码前设立"决策点"（Phase 2 & 3）。只有在方案确认后，AI 才会被授权加载 TDD、多步拆解等专业技能（Phase 4）进行规范化开发。
 - **先验证再闭环**：在宣称修复缺陷或完成开发前，强制要求提供运行测试用例的真实证据。
 
@@ -60,6 +61,7 @@ Cursor 原生支持读取项目 `.cursor/rules` 目录下的 `.mdc` 规则文件
 ```bash
 mkdir -p .cursor/rules
 # 使用软链接，方便未来统一更新工作流
+ln -s ~/.cursor/skills/zh/rules/ai-coding-protocol.mdc .cursor/rules/
 ln -s ~/.cursor/skills/zh/rules/new-task-trigger.mdc .cursor/rules/
 ln -s ~/.cursor/skills/zh/rules/new-task-kickoff.mdc .cursor/rules/
 ```
