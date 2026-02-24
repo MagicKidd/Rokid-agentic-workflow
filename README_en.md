@@ -1,39 +1,46 @@
 # Agentic Coding Workflow
 
-English | [简体中文](./README.md)
+<p align="center">
+  <img src="https://img.shields.io/badge/Agentic-Workflow-blue.svg" alt="Agentic Workflow">
+  <img src="https://img.shields.io/badge/AI_Pair_Programming-Cursor_|_Claude-lightgrey.svg" alt="AI Pair Programming">
+</p>
+
+<p align="center">
+  <b>English</b> | [简体中文](./README.md)
+</p>
 
 > Exploring practical collaboration patterns to help AI coding assistants maintain context and execution discipline in daily development.
 
-Agentic Coding Workflow is an AI collaboration protocol designed for developers. In everyday engineering practices at Rokid, the team (Jing, et al.) noticed that AI coding assistants (like Cursor, Claude Code) often lose context during complex tasks or rush into coding without sufficient design. To mitigate this, we organized this workflow.
+In everyday engineering practices, the team (Jing, et al.) noticed that when using AI coding assistants (like Cursor, Claude Code) for complex tasks, the AI often loses context over long conversations or rushes into coding without sufficient design. This leads to over-engineering or subtle bugs.
 
-By using predefined routing rules (Rules) and professional skill packs (Skills), it breaks down tasks into structured steps—from context gathering and architectural design, to coding and automated verification—making the AI collaboration process more predictable and disciplined.
+**Agentic Coding Workflow** is an AI collaboration protocol designed for developers. By utilizing predefined routing rules (Rules) and professional skill packs (Skills), it breaks down tasks into structured steps—from context gathering and architectural design, to coding and automated verification—making the AI collaboration process more predictable, transparent, and disciplined.
 
-For details, see: [👉 Workflow Concepts & Architecture (WORKFLOW_en.md)](./WORKFLOW_en.md)
+## 📖 Table of Contents
+- [Core Concepts](#-core-concepts)
+- [Quick Start](#-quick-start)
+- [Directory Structure](#-directory-structure)
+- [Basic Usage](#-basic-usage)
+- [License & Acknowledgements](#-license--acknowledgements)
 
 ---
 
-## 📦 Directory Structure
+## 💡 Core Concepts
 
-```text
-agentic-coding-workflow/
-├── rules/                  # Routing rules (intercept task commands and guide execution)
-├── skills/                 # Core skills library (requirements analysis, TDD, etc.)
-├── superpowers/            # [Recommended dependency] obra/superpowers excellent community practices
-├── templates/              # Reusable templates (e.g., project-specific rules, lessons learned)
-├── adapters/               # IDE integration guides (Cursor / Claude Code / OpenCode)
-├── README_en.md            # This document
-└── WORKFLOW_en.md          # Detailed workflow design
-```
+- **Mitigating Context Loss**: Through automated information retrieval (Phase 1), the AI scans related code, architectural documents, and past troubleshooting records right at the beginning of the conversation to establish a solid baseline.
+- **Enforcing Engineering Discipline**: "Decision points" (Phase 2 & 3) are introduced before any code is written. Only after the approach is confirmed by the human will the AI be authorized to load professional skills like TDD or multi-step planning (Phase 4) for standardized development.
+- **Verification First**: The AI is strictly required to provide evidence of passing tests or successful execution before claiming a defect is fixed or a task is completed.
+
+👉 **[Click here for detailed workflow concepts & architecture (WORKFLOW_en.md)](./WORKFLOW_en.md)**
 
 ---
 
 ## ⚡ Quick Start
 
-Regardless of which AI coding tool you use, this pure Markdown-based methodology is relatively straightforward to integrate.
+Regardless of which AI coding tool you use, this pure Markdown-based methodology is relatively straightforward to integrate into your workspace.
 
 ### 1. Get the Toolkit
 
-Clone this repository to your local machine. To include the `superpowers` submodule, use the `--recursive` flag:
+Clone this repository to your local machine. To include the `superpowers` submodule (which provides core foundational dependencies), use the `--recursive` flag:
 
 ```bash
 # Recommended to place in a global, reusable directory
@@ -56,7 +63,7 @@ mkdir -p .cursor/rules
 ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-trigger.mdc .cursor/rules/
 ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-kickoff.mdc .cursor/rules/
 ```
-2. Open Cursor's Composer and simply type: "Start working on a new feature...". The trigger will automatically guide the step-by-step process.
+2. Open Cursor's Composer and simply type: "Start working on a new feature...". The trigger will automatically intercept the prompt and guide the step-by-step process.
 *(See [adapters/cursor/README.md](adapters/cursor/README.md) for more details)*
 
 #### 🔹 For Claude Code Users
@@ -71,24 +78,33 @@ Similarly, copy `adapters/opencode/AGENTS.md` to your project root and update th
 
 ---
 
-## 🛠️ Basic Usage
+## 📦 Directory Structure
 
-Once configured, when you need the AI to assist with development, you can start with a simple prompt:
-
-> **"Start refactoring the user authentication module"** or **"Initiate new task: add export functionality"**
-
-The AI will follow the rules and break the process into phases:
-1. **Auto Context Gathering (Phase 1)**: Retrieves related code, architecture docs, and past troubleshooting records in the background.
-2. **Report & Decision (Phase 2 & 3)**: Summarizes the context it found and asks for your decision (e.g., whether to dive into design discussions or start coding immediately).
-3. **Step-by-Step Execution (Phase 4)**: Once you confirm the approach, the AI loads the appropriate development skills (such as TDD, multi-step planning) to begin coding.
+```text
+agentic-coding-workflow/
+├── rules/                  # Routing rules (intercept task commands and guide execution)
+├── skills/                 # Core skills library (requirements analysis, TDD, etc.)
+├── superpowers/            # [Recommended dependency] obra/superpowers excellent community practices
+├── templates/              # Reusable templates (e.g., project-specific rules, lessons learned)
+├── adapters/               # IDE integration guides (Cursor / Claude Code / OpenCode)
+├── README_en.md            # This document
+└── WORKFLOW_en.md          # Detailed workflow design
+```
 
 ---
 
-## 🌟 Core Practices
+## 🛠️ Basic Usage
 
-- **Verify Before Confirming**: Demand evidence of passing tests before claiming a defect is fixed.
-- **Test-Driven Development (TDD)**: Advocate writing failing test cases before writing business logic.
-- **Task Decomposition**: For complex tasks, encourage managing progress through an external file (`task_plan.md`) or dispatching sub-agents to handle independent tasks in parallel, preventing context overload in a single chat.
+Once configured, when you need the AI to assist with development, you don't need to provide lengthy background information. You can start with a simple prompt:
+
+> **"Start refactoring the user authentication module"** or **"Initiate new task: add export functionality"**
+
+Constrained by the protocol, the AI will break the work into several phases:
+1. **Auto Context Gathering (Phase 1)**: Retrieves related code, architecture docs, and past troubleshooting records in the background.
+2. **Report & Decision (Phase 2 & 3)**: Summarizes the context it found and asks for your decision (e.g., whether to dive into design discussions regarding edge cases, or to start coding immediately).
+3. **Step-by-Step Execution (Phase 4)**: Once you confirm the approach, the AI loads the appropriate development skills (such as TDD, multi-step planning) to begin coding systematically.
+
+---
 
 ## 📜 License & Acknowledgements
 
