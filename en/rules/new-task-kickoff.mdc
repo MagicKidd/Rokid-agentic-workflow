@@ -344,7 +344,9 @@ Recommended path conventions (if project has specific norms, they override these
 | Rule | Relationship | Description |
 |------|--------------|-------------|
 | `new-task-trigger.mdc` | Upstream | Loads this protocol upon detecting signal |
+| `ai-coding-protocol.mdc` | Baseline | Global coding behavior baseline (minimal change, read-before-write, diff self-review) |
 | `[plugin]-playbook.mdc` | Sideload | Dictates project-specific constraints (plugins, paths) |
+| `learned-conventions.mdc` | Auto-load in Phase 4c | Learned project conventions used during coding to replace manual sampling |
 | *(Dynamic business rules)* | Discoverable | Specific task rules dynamically retrieved in Phase 1.3 |
 
 ## Skills Complete Index
@@ -369,8 +371,9 @@ Recommended path conventions (if project has specific norms, they override these
 
 When AI detects these features in the execution chain, **Auto-load corresponding Skill**:
 
-| Feature Detected | Load Skill | Description |
+| Feature Detected | Load Skill / Rule | Description |
 |------------------|------------|-------------|
+| Coding / architecture code design / tests / refactors | `learned-conventions.mdc` | Learned conventions from codebase, replaces manual sampling |
 | Prompt design/optimization | `prompt-engineering` | Prompt work for experts, routing, etc. |
 | Coding implementation | `test-driven-development`| Write tests first, Red-Green-Refactor |
 | Frontend/UI pages | `frontend-design` | Production-grade UI (HTML/React/Vue) |
