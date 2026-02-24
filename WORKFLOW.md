@@ -1,119 +1,100 @@
-# Agentic Workflow: 人类主导设计，AI 自主执行
+# Agentic Workflow: 结构化的 AI 协作流程
 
-## 一、理念：为什么需要 Agentic 工作协议？
+## 一、为什么需要工作流协议？
 
-在 AI 辅助编程（如 Cursor, Claude Code 等）中，开发者常遇到两大核心瓶颈：
-1. **上下文遗忘与污染**：AI 容易在一个长对话中忘记最初的目标，或者因为代码库庞大而产生"幻觉"；
-2. **缺乏流程纪律**：AI 经常在没有完全理解需求的情况下急于写代码，导致反复修改、过度工程甚至引入新的 Bug。
+在使用各种强大的 AI 辅助编程工具（如 Cursor, Claude Code）时，经常会遇到以下痛点：
+1. **上下文遗忘**：由于单次对话过长，AI 很容易偏离最初的目标，或在庞大的代码库中产生不相关的修改建议。
+2. **缺乏流程纪律**：如果给出较为宽泛的任务指令，AI 可能会在没有理清需求边界和现有架构的情况下，直接给出大段的实现代码，导致过度工程或引入难以察觉的 Bug。
 
-**Agentic Workflow Kit** 由 Rokid 研发工程师 **Jingliang** 设计并提炼。它不仅仅是几个提示词（Prompt），而是一套严密的 **"AI 工程师工作协议"**，它的核心理念是：
+我们希望通过这套约定，对 AI 的行为进行规范化的引导，核心思路是：
 
-> **设计阶段 = 人类驱动（AI 准备上下文，人类决定方向）**
-> **实施阶段 = AI 驱动（方案确认后，AI 自主调用 Skills 链条高效推进）**
+> **人类主导设计，提供输入并做出决策；AI 收集信息，提供选项，并在确认后严谨执行。**
 
-通过这套工作流，我们将原本不可控的对话，变成了一条具有明确质量门控（Quality Gates）的工业化生产线。
+通过引入阶段划分（Phases）和明确的检查点（Checkpoints），我们将发散的对话转化为更为可预期的流程。
 
 ---
 
 ## 二、工作流全景图
 
-当你在 IDE 中输入类似 _"开始做一个新功能"_ 或 _"重构认证模块"_ 时，调度引擎会立即拦截并拉起以下四个 Phase（阶段）：
+当向 IDE 下达例如 _"开始实现购物车逻辑"_ 的指令时，触发规则会引导对话进入如下的阶段：
 
 ```mermaid
 graph TD
     User([用户发起新任务]) --> P1
     
-    subgraph Phase 1: 自动上下文采集 (并行)
-        P1[感知与嗅探] --> |Task 子代理| P1A[历史对话搜索]
-        P1 --> |Task 子代理| P1B[相关文档匹配]
-        P1 --> |Task 子代理| P1C[已有规则/教训检查]
-        P1 --> |Task 子代理| P1D[代码与近期变更分析]
+    subgraph Phase 1: 上下文采集
+        P1[自动信息检索] --> P1A[历史教训与文档]
+        P1 --> P1B[代码依赖与近期变更]
     end
     
-    P1A & P1B & P1C & P1D --> P2
+    P1A & P1B --> P2
     
     subgraph Phase 2 & 3: 摘要与人类决策
-        P2[呈现结构化上下文摘要] --> P3{等待人类决策}
-        P3 -->|A. 方案不明确| C1[深度设计讨论]
-        P3 -->|B. 方案清晰| C2[实施计划制定]
+        P2[呈现结构化摘要] --> P3{等待用户选择方向}
+        P3 -->|A. 需讨论需求| C1[进行深度探讨]
+        P3 -->|B. 方案清晰| C2[制定实施计划]
         P3 -->|C. 简单明确| C3[直接编码]
-        P3 -->|D. 排查缺陷| C4[系统化调试]
+        P3 -->|D. 排查问题| C4[规范化排查]
     end
     
-    subgraph Phase 4: AI 自主执行链 (基于 Skills)
-        C1 --> |brainstorming| Doc[产出设计文档]
+    subgraph Phase 4: AI 推进执行 (按需加载技能)
+        C1 --> |应用头脑风暴指南| Doc[敲定设计]
         Doc --> C2
         
-        C2 --> |writing-plans| Plan[拆解任务步骤]
-        Plan --> |subagent-driven| Exec[派发子代理并行执行]
+        C2 --> |应用任务拆解指南| Plan[输出步骤清单]
+        Plan --> |支持子代理并行| Exec[按步骤执行]
         
-        Exec --> |requesting-code-review| Review[代码审查]
-        Review --> |TDD & kaizen| Valid[完成前验证]
+        Exec --> |要求代码审查| Review[阶段复查]
+        Review --> |倡导 TDD 测试先行| Valid[测试与验证]
         
         C3 --> Valid
         
-        C4 --> |systematic-debugging| Fix[根因调查与修复]
+        C4 --> |应用系统化调试指南| Fix[定位与修复]
         Fix --> Valid
         
-        Valid --> |finishing-branch| Done([完成并清理分支])
+        Valid --> Done([任务闭环])
     end
     
     classDef phase fill:#f9f9f9,stroke:#333,stroke-width:2px;
     class P1,P2,P3,Phase4 phase;
 ```
 
-### Phase 1: 自动上下文采集
-AI 不会立刻回答，而是派出多个子代理（Sub-agents）去后台执行 `grep`、搜索文档、查阅历史教训（Lessons Learned），并在几秒内完成全盘扫描。
+### Phase 1: 上下文采集
+AI 先不急于给出代码，而是通过文件搜索或执行脚本，扫描项目里的文档、关联的代码模块，甚至是以前犯错积累下来的 `lessons.md` 避坑指南。
 
-### Phase 2 & 3: 摘要呈现与人类决策
-AI 将收集到的信息进行结构化总结，列出发现的约束、依赖，并向人类请示接下来的行动路径。
+### Phase 2 & 3: 摘要与人类决策
+AI 将收集到的关键信息进行汇总，列出它理解的当前状态与约束条件，然后询问人类开发者希望如何推进（是需要一起讨论设计，还是可以直接按照现有计划开干）。
 
-### Phase 4: AI 自主执行链
-人类一旦做出选择，AI 便会根据路径自动加载对应的专业知识库（Skills），开始无需人类干预的"链式操作"。比如：拆解任务 -> 派发子代理写测试 -> 编码 -> 代码审查 -> 验证 -> 提交。
-
----
-
-## 三、核心 Skills 说明
-
-Skills 就像是 AI 的"能力插件"。我们将它们分为几个圈层，相互配合：
-
-### 1. 流程调度引擎（核心）
-- **`new-task-trigger.mdc`**：信号拦截器，常驻后台。
-- **`new-task-kickoff.mdc`**：总司令，定义了上面提到的 Phase 1-4 协议。
-
-### 2. 思维工具（决策增强）
-在 Phase 3 人类决策阶段，如果方向不明确，AI 会动用这些能力：
-- **`brainstorming`**：结构化头脑风暴，一次一问，强制提供多选选项，增量确认设计。
-- **`expert-debate`**：让两个 AI 专家进行三轮辩论，解决技术分歧。
-- **`expert-collaboration`**：让不同领域的 AI 专家各自贡献视角，渐进收敛。
-- **`internalized-cognition`**：让 AI "成为"系统本身，从第一人称视角获取深层洞察。
-
-### 3. 工程实践（质量保障）
-在 Phase 4 执行阶段，AI 的行为受到这些规范的严格约束：
-- **`software-architecture`**：强制遵循 Clean Architecture 和 DDD，杜绝随意堆砌代码。
-- **`kaizen`**：持续改进，防错设计（Poka-Yoke），拒绝过度工程（YAGNI）。
-- **`subagent-driven-development`**：用子代理执行独立任务，防止长对话污染。
-- **`planning-with-files`**：通过生成 `task_plan.md` 建立"外置工作记忆"。
-- **`test-driven-development`**：红-绿-重构循环，无测试不编码的铁律。
-
-### 4. AI 元能力（自我进化）
-- **`find-skills`**：让 AI 学会去查阅自己有什么能力，并有安全审核流程。
-- **`skill-creator`**：标准化创建新 Skill 的流程。
-- **`prompt-engineering`**：撰写高效提示词的方法论。
-
-### 5. Superpowers (推荐基石依赖)
-本项目将社区顶级的 [obra/superpowers](https://github.com/obra/superpowers-skills) 作为子模块引入。它提供了大量优秀的底层实践，如系统化调试 (`systematic-debugging`)、验证门控 (`verification-before-completion`) 等，被我们的调度引擎在关键节点调用。
+### Phase 4: AI 推进执行
+得到人类的确认后，AI 会根据所选路径，自动加载对应的专业知识库（Skills）。例如，如果进入了排错模式，它会加载 `systematic-debugging` 技能，强制自己先查明根因再提供修改建议；如果是写新模块，它会遵循 TDD 指南，先建立测试文件。
 
 ---
 
-## 四、定制指南
+## 三、部分核心 Skills 简介
 
-### 1. 如何添加你的项目专属规则
-你可以为不同的项目或模块创建专属的规则文件（`.mdc`）。只需将它们放在 `.cursor/rules/` 目录下，并在头部添加描述。`new-task-kickoff` 在 Phase 1 会自动将它们扫描出来并应用。
-（可参考 `templates/project-rules-example.mdc`）
+Skills 是指导 AI 在特定场景下如何行为的文本参考，它们按作用被划分：
 
-### 2. 如何记录全局教训
-在与 AI 协作时，如果 AI 犯了错，你可以纠正它并告诉它"把这个加入全局教训"。AI 会自动将该教训追加到 `_global_lessons.md`（见 `templates/`）中。这样，下次启动任何新任务时，AI 都会提前规避这个错误。
+### 1. 思维辅助与讨论
+在需求不明确时，引导 AI 以提问或辩论的方式帮助收敛思路。
+- **`brainstorming`**：要求 AI 一次只问一个问题，给出多个可能的选择供用户挑选，而不是长篇大论。
+- **`expert-debate`** / **`expert-collaboration`**：让 AI 模拟不同视角的专家，通过讨论暴露方案中的风险点。
 
-### 3. 如何扩展新 Skill
-让 AI 执行："使用 `skill-creator` 帮我创建一个名为 `xxx` 的新技能"。AI 会按照标准流程询问你的需求，提炼出可复用的组件，并生成完整的 `SKILL.md` 文档。
+### 2. 研发纪律约束
+在执行阶段，规范 AI 产出代码的过程。
+- **`kaizen`**：强调简单的迭代和持续改进，避免为了尚未发生的需求过度设计（YAGNI）。
+- **`software-architecture`**：倡导清晰的关注点分离，优先使用现有成熟的库而不是手写基础设施代码。
+- **`test-driven-development`**：提醒 AI 先写测试用例验证预期，再去修改业务代码。
+- **`planning-with-files`**：当步骤较多时，引导 AI 维护外部的进展记录文件，避免记忆丢失。
+
+### 3. 基石实践依赖 (Superpowers)
+引入的社区优秀实践合集（`obra/superpowers`），它提供了底层的流程保障，例如：
+- **`verification-before-completion`**：规定 AI 在结束任务前必须主动执行脚本检查运行结果。
+- **`subagent-driven-development`**：利用子代理拆分独立任务，隔离对话上下文。
+
+---
+
+## 四、如何定制工作流
+
+1. **项目级规则约定**：你可以在业务项目的 `.cursor/rules/` 目录下放置特定的技术规范文件。当 Phase 1 扫描时，AI 会自动感知并把这些定制约束考虑进去。
+2. **沉淀历史教训**：在合作中如果发现 AI 反复犯某一类错误，可以直接指出并让它写入项目内的 `lessons.md`。这将被作为前置经验在后续任务中被自动参考。
+3. **编写新的 Skill**：如果你有专门的内网工具使用手册，或是公司统一的 UI 库开发指南，可以通过纯文本的方式添加到 `skills/` 中，并在你的日常 Prompt 中指示 AI 读取它们。

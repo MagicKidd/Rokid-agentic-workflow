@@ -1,21 +1,25 @@
-# Agentic Workflow Kit 🚀
+# Agentic Coding Workflow
 
-> 将不可控的 AI 对话，变成具有严密质量门控的工业化流水线。
+[English](./README_en.md) | 简体中文
 
-Agentic Workflow Kit 是一套专为资深开发者设计的 **"AI 工程师工作协议"**，由 Rokid 研发工程师 [Jingliang] 总结和提炼，将业界顶尖的 AI 开发实践系统化地组织在了一起。它由一系列规则（Rules）和能力插件（Skills）组成，通过拦截任务信号、自动采集上下文、引导人类决策，最后拉起 AI 的自主执行链（TDD, 代码审查, 自动化验证），极大地提升了使用 AI 辅助编程的效率和代码质量。
+> 探索在日常开发中让 AI 编程助手保持上下文连贯和执行纪律的协作模式。
 
-详见：[👉 工作流核心理念与全景图 (WORKFLOW.md)](./WORKFLOW.md)
+Agentic Coding Workflow 是一套面向开发者的 AI 协作协议。在 Rokid 的实际业务开发中，团队（Jing 等）发现 AI（如 Cursor, Claude Code）在处理复杂任务时，往往容易丢失上下文或在没有充分设计的情况下急于编码。为此，我们整理了这套工作流。
+
+它通过预定义的调度规则（Rules）和专业技能包（Skills），将任务拆解为从上下文采集、方案设计到代码实现、自动化验证的结构化步骤，从而让 AI 的协作过程更加可控和规范。
+
+详见：[👉 工作流核心思路与全景图 (WORKFLOW.md)](./WORKFLOW.md)
 
 ---
 
 ## 📦 目录结构
 
 ```text
-rokid-agentic-workflow/
-├── rules/                  # 流程调度引擎（核心调度规则）
-├── skills/                 # 原创核心技能库（思维增强、工程实践、AI 元能力等）
-├── superpowers/            # [推荐依赖] obra/superpowers 社区顶级实践集
-├── templates/              # 可复用模板（教训记忆、项目规则示例）
+agentic-coding-workflow/
+├── rules/                  # 流程调度规则（拦截任务指令并引导分步执行）
+├── skills/                 # 核心技能库（包含需求分析、架构指导、测试驱动等实践）
+├── superpowers/            # [推荐依赖] obra/superpowers 优秀的社区实践合集
+├── templates/              # 可复用模板（如项目规则约定、避坑记录）
 ├── adapters/               # 跨 IDE 适配指南（Cursor / Claude Code / OpenCode）
 ├── README.md               # 本文档
 └── WORKFLOW.md             # 详细工作流设计说明
@@ -25,17 +29,17 @@ rokid-agentic-workflow/
 
 ## ⚡ 快速开始
 
-无论你使用的是哪款顶级 AI 编程工具，这套工作流（纯 Markdown 方法论）都能无缝接入。
+无论你使用的是哪款 AI 编程工具，这套基于纯 Markdown 的方法论都能相对容易地接入。
 
 ### 1. 获取套件
 
-首先将本仓库克隆到你的本地电脑。为了包含 `superpowers` 子模块，请加上 `--recursive` 参数：
+将本仓库克隆到你的本地。为了包含 `superpowers` 子模块，建议使用 `--recursive` 参数：
 
 ```bash
-# 假设你希望放在统一的共享目录下
+# 建议放置在全局的可重用目录
 mkdir -p ~/.cursor/skills_shared
 cd ~/.cursor/skills_shared
-git clone --recursive https://github.com/<your-org>/rokid-agentic-workflow.git
+git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git
 ```
 
 ### 2. IDE 适配配置
@@ -48,18 +52,18 @@ Cursor 原生支持读取项目 `.cursor/rules` 目录下的 `.mdc` 规则。
 1. 在你的项目根目录执行：
 ```bash
 mkdir -p .cursor/rules
-# 推荐使用软链接，这样你更新 workflow-kit 时，所有项目都能受益
-ln -s ~/.cursor/skills_shared/rokid-agentic-workflow/rules/new-task-trigger.mdc .cursor/rules/
-ln -s ~/.cursor/skills_shared/rokid-agentic-workflow/rules/new-task-kickoff.mdc .cursor/rules/
+# 使用软链接，方便统一更新工作流
+ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-trigger.mdc .cursor/rules/
+ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-kickoff.mdc .cursor/rules/
 ```
-2. 打开 Cursor 的 Composer，直接输入："开始做一个新功能..."，工作流即刻触发。
+2. 打开 Cursor 的 Composer，直接输入："开始做一个新功能..."，触发器将自动引导执行步骤。
 *(更多说明见 [adapters/cursor/README.md](adapters/cursor/README.md))*
 
 #### 🔹 Claude Code 用户
 Claude Code 依赖项目根目录的 `CLAUDE.md` 来加载系统级上下文。
 
 1. 将 `adapters/claude-code/CLAUDE.md` 复制到你的项目根目录。
-2. **重要**：编辑该 `CLAUDE.md`，将其中的 `<path-to-rokid-agentic-workflow>` 替换为你实际克隆本仓库的绝对路径（例如 `/Users/name/.cursor/skills_shared/rokid-agentic-workflow`）。
+2. 编辑该 `CLAUDE.md`，将其中的 `<path-to-agentic-coding-workflow>` 替换为你实际克隆本仓库的绝对路径。
 3. 运行 `claude` 并下达任务，Claude 会自动阅读指定的 Skills 并遵循流程。
 
 #### 🔹 OpenCode 及其他
@@ -67,28 +71,27 @@ Claude Code 依赖项目根目录的 `CLAUDE.md` 来加载系统级上下文。
 
 ---
 
-## 🛠️ 如何使用？
+## 🛠️ 基本使用
 
-接入完成后，你不再需要像以前那样向 AI 交代冗长的背景。只需简单一句：
+配置完成后，当你需要让 AI 协助开发时，可以使用简单的指令启动：
 
-> **"开始重构用户认证模块"** 或 **"启动新任务：增加导出 Excel 功能"**
+> **"开始重构用户认证模块"** 或 **"启动新任务：增加导出功能"**
 
-AI 将立即进入 **Phase 1 (上下文自动采集)**，你会看到它在后台搜索代码、翻阅文档、查找历史踩坑记录。接着它会向你汇报（**Phase 2**），并请你做出关键架构决策（**Phase 3**）。一旦你确认了路线，它就会自动加载 TDD、Debug 等专业 Skills，开始自主编码和验证（**Phase 4**）。
+AI 会根据规则分为几个阶段：
+1. **自动采集 (Phase 1)**：在后台检索关联代码、架构文档和历史踩坑记录。
+2. **汇报与决策 (Phase 2 & 3)**：向你总结它找到的上下文，并询问你的决定（例如是需要深入讨论设计，还是直接开始编码）。
+3. **分步执行 (Phase 4)**：在你确认方案后，AI 会加载相应的开发技能（如 TDD 测试驱动、多步骤计划拆解）开始编码。
 
 ---
 
-## 五、关于作者与开源声明
+## 🌟 核心实践参考
 
-**Agentic Workflow Kit** 由 Rokid 研发工程师 **Jingliang** 总结、提炼和设计。
-在 Rokid 的 AI 智能体开发实践中，我们深切体会到了在复杂项目中保持 AI 行为可控性与纪律性的重要性。因此，我们将团队内部的 AI 结对编程协议开源，希望能为更广泛的开发者社区带来价值。
+- **先验证再确认**：在宣称修复缺陷之前，需有执行测试用例的证据。
+- **测试驱动 (TDD)**：倡导在编写业务代码前先编写失败的测试用例。
+- **任务拆解**：针对复杂任务，鼓励通过外部文件 (`task_plan.md`) 管理进度，或者派发子代理并行处理不相关的任务，防止单次对话上下文过载。
 
-本项目的核心调度规则（Rules）和大部分架构增强与思维扩展（Skills）为原创。同时，我们站在了巨人的肩膀上，将业界顶尖的开源项目 [obra/superpowers](https://github.com/obra/superpowers-skills) 作为了推荐的核心底层实践。
+## 📜 许可与致谢
 
-- **无验证，不完成**：AI 在宣称修复了 Bug 之前，必须有跑通测试的实质性证据。
-- **无测试，不编码**：强制 TDD，看到红色的失败测试，才允许写第一行绿色的生产代码。
-- **隔离污染**：使用子代理（Sub-agents）并行处理独立任务，避免单一长对话导致 AI 智商下降。
-- **持续教训记忆**：AI 犯错被纠正后，会自动将其记录到全局或局部的 `lessons.md`，下次绝不重犯。
+本项目开源，欢迎交流与贡献。
 
-## 📜 许可证 (License)
-
-本项目开源。其中 `superpowers` 目录版权归原作者 [@obra](https://github.com/obra/superpowers-skills) 所有。
+在构建这套工作流的过程中，我们参考和借鉴了开源社区中优秀的实践经验。特别感谢 [@obra](https://github.com/obra/superpowers-skills) 提供的 `superpowers` 集合，它包含了大量极具价值的底层工程纪律设计。本仓库内的 `superpowers` 目录作为 Git Submodule 引入，版权归原作者所有。
