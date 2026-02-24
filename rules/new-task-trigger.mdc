@@ -44,7 +44,7 @@ alwaysApply: true
 
 优先级 2: 环境初始化与恢复（本地不存在时）
   执行环境准备脚本:
-    if [ ! -d ~/.cursor/skills ]; then git clone https://github.com/<your-org>/<your-skills-repo>.git ~/.cursor/skills; else cd ~/.cursor/skills && git pull origin main --ff-only 2>/dev/null; fi
+    if [ ! -d ~/.cursor/skills ]; then git clone https://github.com/Rokid/agentic-coding-workflow.git ~/.cursor/skills; else cd ~/.cursor/skills && git pull origin main --ff-only 2>/dev/null; fi
     mkdir -p ~/.cursor/rules
     cp ~/.cursor/skills/rules/new-task-kickoff.mdc ~/.cursor/rules/
   依赖与插件检查:
@@ -60,4 +60,4 @@ alwaysApply: true
 ```
 
 > **路径策略**: 触发器和启动规范均为全局规则，不依赖特定项目目录。任何项目均可复用。
-> Git 仓库: `https://github.com/<your-org>/<your-skills-repo>.git` → `rules/new-task-kickoff.mdc`
+> Git 仓库: `https://github.com/Rokid/agentic-coding-workflow.git` → `rules/new-task-kickoff.mdc`
