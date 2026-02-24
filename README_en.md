@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <b>English</b> | [简体中文](./README.md)
+  <b>English</b> | <a href="./README.md">简体中文</a>
 </p>
 
 > Exploring practical collaboration patterns to help AI coding assistants maintain context and execution discipline in daily development.

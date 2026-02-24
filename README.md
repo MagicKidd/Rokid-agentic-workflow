@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  [English](./README_en.md) | <b>简体中文</b>
+  <a href="./README_en.md">English</a> | <b>简体中文</b>
 </p>
 
 > 探索在日常开发中，让 AI 编程助手保持上下文连贯与执行纪律的协作协议。
