@@ -44,9 +44,9 @@ Clone this repository to your local machine. To include the `superpowers` submod
 
 ```bash
 # Recommended to place in a global, reusable directory
-mkdir -p ~/.cursor/skills_shared
-cd ~/.cursor/skills_shared
-git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git
+mkdir -p ~/.cursor/skills
+cd ~/.cursor/skills
+git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git .
 ```
 
 ### 2. IDE Integration
@@ -60,8 +60,8 @@ Cursor natively supports reading `.mdc` rules from the `.cursor/rules` directory
 ```bash
 mkdir -p .cursor/rules
 # Use symlinks to easily keep your workflow updated across projects
-ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-trigger.mdc .cursor/rules/
-ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-kickoff.mdc .cursor/rules/
+ln -s ~/.cursor/skills/en/rules/new-task-trigger.mdc .cursor/rules/
+ln -s ~/.cursor/skills/en/rules/new-task-kickoff.mdc .cursor/rules/
 ```
 2. Open Cursor's Composer and simply type: "Start working on a new feature...". The trigger will automatically intercept the prompt and guide the step-by-step process.
 *(See [adapters/cursor/README.md](adapters/cursor/README.md) for more details)*
@@ -82,8 +82,12 @@ Similarly, copy `adapters/opencode/AGENTS.md` to your project root and update th
 
 ```text
 agentic-coding-workflow/
-├── rules/                  # Routing rules (intercept task commands and guide execution)
-├── skills/                 # Core skills library (requirements analysis, TDD, etc.)
+├── zh/                     # Chinese rules and skills
+│   ├── rules/
+│   └── skills/
+├── en/                     # English rules and skills
+│   ├── rules/              # Routing rules
+│   └── skills/             # Core skills library
 ├── superpowers/            # [Recommended dependency] obra/superpowers excellent community practices
 ├── templates/              # Reusable templates (e.g., project-specific rules, lessons learned)
 ├── adapters/               # IDE integration guides (Cursor / Claude Code / OpenCode)

@@ -44,9 +44,9 @@
 
 ```bash
 # 建议放置在全局的可重用目录
-mkdir -p ~/.cursor/skills_shared
-cd ~/.cursor/skills_shared
-git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git
+mkdir -p ~/.cursor/skills
+cd ~/.cursor/skills
+git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git .
 ```
 
 ### 2. IDE 适配配置
@@ -60,8 +60,8 @@ Cursor 原生支持读取项目 `.cursor/rules` 目录下的 `.mdc` 规则文件
 ```bash
 mkdir -p .cursor/rules
 # 使用软链接，方便未来统一更新工作流
-ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-trigger.mdc .cursor/rules/
-ln -s ~/.cursor/skills_shared/agentic-coding-workflow/rules/new-task-kickoff.mdc .cursor/rules/
+ln -s ~/.cursor/skills/zh/rules/new-task-trigger.mdc .cursor/rules/
+ln -s ~/.cursor/skills/zh/rules/new-task-kickoff.mdc .cursor/rules/
 ```
 2. 打开 Cursor 的 Composer，直接输入指令（如："开始做一个新功能..."），触发器将自动引导 AI 进入分步流程。
 *(更多说明见 [adapters/cursor/README.md](adapters/cursor/README.md))*
@@ -82,8 +82,12 @@ Claude Code 依赖项目根目录的 `CLAUDE.md` 来加载系统级上下文。
 
 ```text
 agentic-coding-workflow/
-├── rules/                  # 流程调度规则（拦截任务指令并引导分步执行）
-├── skills/                 # 核心技能库（需求探讨、架构分析、TDD等实践指南）
+├── zh/                     # 中文版规则和技能
+│   ├── rules/              # 流程调度规则
+│   └── skills/             # 核心技能库
+├── en/                     # 英文版规则和技能
+│   ├── rules/
+│   └── skills/
 ├── superpowers/            # [推荐依赖] obra/superpowers 优秀的社区基石实践
 ├── templates/              # 可复用模板（如项目规则约定、避坑记录文件）
 ├── adapters/               # 跨 IDE 适配指南（Cursor / Claude Code / OpenCode）
