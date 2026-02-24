@@ -4,7 +4,7 @@ OpenCode 原生支持通过根目录的 `AGENTS.md` 文件加载 AI 工程师规
 
 ## 配置方法
 
-将此文件重命名为 `AGENTS.md` 并放置在您的项目根目录下。**请注意将 `<path-to-agentic-workflow-kit>` 替换为实际路径**。
+将此文件重命名为 `AGENTS.md` 并放置在您的项目根目录下。**请注意将 `<path-to-rokid-agentic-workflow>` 替换为实际路径**。
 
 ```markdown
 # AI 工程师协作协议 (Agentic Workflow)
@@ -34,9 +34,9 @@ C. 排查调试 (Debugging)
 ## 执行依赖指南 (Skills)
 在你遇到特定任务时，**必须**首先阅读对应的 Markdown 指南并严格执行其中的规范：
 
-- 当你需要**讨论架构与需求**时，阅读: `<path-to-agentic-workflow-kit>/skills/brainstorming/SKILL.md`
-- 当任务**包含多步骤**时，阅读: `<path-to-agentic-workflow-kit>/skills/planning-with-files/SKILL.md`
-- 当你准备**开始写代码**时，阅读 TDD 规范: `<path-to-agentic-workflow-kit>/skills/test-driven-development/SKILL.md`
-- 当你**陷入困境或排查 Bug** 时，阅读: `<path-to-agentic-workflow-kit>/superpowers/debugging/systematic-debugging/SKILL.md`
-- 当你需要**宣告任务完成**时，阅读验证规范: `<path-to-agentic-workflow-kit>/superpowers/debugging/verification-before-completion/SKILL.md`
+- 当你需要**讨论架构与需求**时，阅读: `<path-to-rokid-agentic-workflow>/skills/brainstorming/SKILL.md`
+- 当任务**包含多步骤**时，阅读: `<path-to-rokid-agentic-workflow>/skills/planning-with-files/SKILL.md`
+- 当你准备**开始写代码**时，阅读 TDD 规范: `<path-to-rokid-agentic-workflow>/skills/test-driven-development/SKILL.md`
+- 当你**陷入困境或排查 Bug** 时，阅读: `<path-to-rokid-agentic-workflow>/superpowers/debugging/systematic-debugging/SKILL.md`
+- 当你需要**宣告任务完成**时，阅读验证规范: `<path-to-rokid-agentic-workflow>/superpowers/debugging/verification-before-completion/SKILL.md`
 ```

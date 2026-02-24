@@ -24,8 +24,12 @@ alwaysApply: false
 
 ```yaml
 嗅探路径: .cursor/rules/*-playbook.mdc, .cursor/rules/project-context.mdc, 或项目根目录下的配置说明
-目标: 获取本项目的具体架构、模块缩写和专用路径映射
-效果: 如果找到该外挂配置，立即读取，并使用其中的"专属约定"覆写后续 1.2（文档）、1.4（代码）的默认搜索策略。实现通用工作流与定制化项目深度的无缝桥接。
+目标: 获取本项目的具体架构、模块缩写、专用路径映射、以及必须的插件清单
+效果: 
+  - 如果找到该外挂配置，立即读取，并使用其中的"专属约定"覆写后续 1.2（文档）、1.4（代码）的默认搜索策略。
+  - 读取其中的 `required_plugins` / 依赖声明，提示用户或自动安装缺失的 Cursor Plugins / MCP Servers。
+  - 提取当前项目特有的规则关系（动态替代下文的"与现有规则的关系"）。
+  - 实现通用工作流与定制化项目深度的无缝桥接。
 ```
 
 ### 1.1 历史对话搜索
@@ -239,8 +243,8 @@ E) 你自己先想 → 我待命
   │
   ├─ 路径 B（实施规划）:
   │   writing-plans 拆解任务
-  │     → [如涉及 LLM] 加载 llm-test-standard + prompt-engineering
-  │     → [如涉及前端] 加载 frontend-design / ui-ux-pro-max
+  │     → [如涉及 LLM] 加载 prompt-engineering
+  │     → [如涉及前端] 加载 frontend-design
   │     → test-driven-development 先写测试
   │     → subagent-driven-development 并行执行
   │     → 每批任务后 requesting-code-review 审查
@@ -270,6 +274,7 @@ E) 你自己先想 → 我待命
 5. **用户附加约束始终生效** — Phase 4b 记录的条件在整个执行链中遵守
 6. **非 trivial 改动前自我审视** — 完成复杂实现后，先问自己"有没有更简洁的方式"，再提交审查；简单修改跳过此步
 7. **双层教训记录** — 被用户纠正错误后，向用户确认并记录到 `~/.cursor/skills/_global_lessons.md` (全局) 或项目内的 `lessons.md` (局部)，防止重复犯错。
+8. **教训分级归档** — 若在 Phase 1.6 或执行期间发现任一 lessons.md 教训条目超过 20 条，应主动提议合并同类项，或将已内化的旧教训移动至 `lessons_archive.md` 中，保持主记忆精简。
 
 ---
 
@@ -279,10 +284,10 @@ E) 你自己先想 → 我待命
 
 ```text
 按认知类型分工，而非按贵贱分层：
-  T1 推理层（Opus 4.6）  = 需要"想"的任务：设计、计划、审查、验证判断
-  T2 编码层（Codex 5.3）  = 需要"写"的任务：编程、测试实现
-  T3 理解层（Gemini 3.1） = 需要"读"的任务：文档理解、前端开发
-  T4 机械层（Fast）       = 需要"跑"的任务：搜索、git、文件操作
+  T1 推理层（Reasoning Models）  = 需要"想"的任务：设计、计划、审查、验证判断
+  T2 编码层（Coding Models）     = 需要"写"的任务：编程、测试实现
+  T3 理解层（Understanding）      = 需要"读"的任务：文档理解、多模态分析
+  T4 机械层（Fast Models）       = 需要"跑"的任务：搜索、git、文件操作
 ```
 
 ### 自动降级（AI 执行）
@@ -298,33 +303,27 @@ E) 你自己先想 → 我待命
 
 ```text
 进入大量编码/测试实现阶段时：
-  "接下来是密集编码任务，建议切换到 Codex 5.3 以节省成本。
-   完成后回到 Opus 做代码审查。要切换吗？"
+  "接下来是密集编码任务，建议切换到擅长编码的更快的模型以节省成本。
+   完成后回到最强推理模型做代码审查。要切换吗？"
 
-进入文档阅读/前端开发阶段时：
-  "接下来需要阅读大量文档 / 进行前端开发，建议切换到 Gemini 3.1。
-   它的长上下文和视觉理解更适合这类任务。要切换吗？"
-
-编码/前端完成，进入审查阶段时：
+编码完成，进入审查阶段时：
   "编码阶段完成，接下来进入代码审查和验证。
-   建议切回 Opus 4.6 做深度判断。要切换吗？"
+   建议切回最强推理模型做深度判断。要切换吗？"
 ```
 
 ### 模型-任务映射速查
 
-| 任务阶段 | 推荐模型 | 切换方式 | 理由 |
+| 任务阶段 | 推荐模型层级 | 切换方式 | 理由 |
 |---------|---------|---------|------|
-| Phase 1 上下文采集 | Fast | 自动（子代理） | 搜索匹配，无需推理 |
-| Phase 2 摘要生成 | Opus 4.6 | 保持主模型 | 综合判断 |
-| Phase 3 需求确认 | Opus 4.6 | 保持主模型 | 理解模糊意图 |
-| Phase 4a 方向选择 | Opus 4.6 | 保持主模型 | 架构决策 |
-| Phase 4c 计划拆解 | Opus 4.6 | 保持主模型 | 需要架构思维 |
-| Phase 4c 密集编码 | Codex 5.3 | **提醒手动切换** | 代码生成效率高 |
-| Phase 4c 文档理解 | Gemini 3.1 | **提醒手动切换** | 长上下文 + 多模态 |
-| Phase 4c 前端开发 | Gemini 3.1 | **提醒手动切换** | 视觉理解 + 前端生成 |
-| Phase 4c 代码审查 | Opus 4.6 | **提醒切回** | 深度判断 |
-| Phase 4c 验证判断 | Opus 4.6 | **提醒切回** | 结果分析 |
-| Phase 4c 跑命令/git | Fast | 自动（子代理） | 机械执行 |
+| Phase 1 上下文采集 | 机械层 (Fast) | 自动（子代理） | 搜索匹配，无需推理 |
+| Phase 2 摘要生成 | 推理层 (Reasoning) | 保持主模型 | 综合判断 |
+| Phase 3 需求确认 | 推理层 (Reasoning) | 保持主模型 | 理解模糊意图 |
+| Phase 4a 方向选择 | 推理层 (Reasoning) | 保持主模型 | 架构决策 |
+| Phase 4c 计划拆解 | 推理层 (Reasoning) | 保持主模型 | 需要架构思维 |
+| Phase 4c 密集编码 | 编码层 (Coding) | **提醒手动切换** | 代码生成效率高 |
+| Phase 4c 代码审查 | 推理层 (Reasoning) | **提醒切回** | 深度判断 |
+| Phase 4c 验证判断 | 推理层 (Reasoning) | **提醒切回** | 结果分析 |
+| Phase 4c 跑命令/git | 机械层 (Fast) | 自动（子代理） | 机械执行 |
 
 ---
 
@@ -341,13 +340,13 @@ E) 你自己先想 → 我待命
 
 ---
 
-## 与现有规则的关系
+## 与核心规则的关系
 
 | 规则 | 关系 | 说明 |
 |------|------|------|
 | `new-task-trigger.mdc` | 上游 | 触发器检测信号后加载本规则 |
-| `example-backend-prototype.mdc` | 产物示例 | 任务级规则是本规则 Phase 4 可能创建的产物 |
-| `example-module-test.mdc` | 可被发现 | 本规则 Phase 1.3 中可发现并加载 |
+| `[外挂]-playbook.mdc` | 侧载 | 决定本项目特有约束（插件依赖、路径约定等） |
+| *(动态加载的业务规则)* | 可被发现 | 由 Phase 1.3 动态检索出的特定任务规则 |
 
 ## Skills 完整索引
 
@@ -374,12 +373,8 @@ AI 在执行链中检测到以下特征时，**自动加载对应 Skill**：
 | 检测特征 | 加载 Skill | 说明 |
 |---------|-----------|------|
 | 任务涉及 Prompt 设计/优化 | `prompt-engineering` | 专家层、意图识别、压缩模块等 Prompt 工作 |
-| 任务涉及 LLM 模块测试 | `llm-test-standard` | 四维测试框架、模型对比、Token 统计 |
 | 任务涉及编码实现 | `test-driven-development` | 先写测试，Red-Green-Refactor |
 | 任务涉及前端/UI 页面 | `frontend-design` | 生产级前端界面（HTML/React/Vue） |
-| 任务涉及 UI/UX 设计 | `ui-ux-pro-max` | 样式、配色、字体、布局等设计决策 |
-| 任务涉及 Excel 生成/编辑 | `xlsx` (document-skills) | 销售材料、测试报告等表格文件 |
-| 任务涉及 HTML 原型截图 | `html-screenshot` | Pencil 导出、原型存档 |
 | 需要重构/持续改进 | `kaizen` | 避免过度工程、防错设计、迭代改进 |
 | 需要新项目/模块文档 | `project-documentation` | README、开发指南、架构文档 |
 
@@ -393,75 +388,71 @@ AI 在执行链中检测到以下特征时，**自动加载对应 Skill**：
 
 ---
 
-## 示例场景
+## 示例场景（通用演练）
 
-### 场景 1: 用户说"开始做室内位置配置页面"
+### 场景 1: 用户说"开始做商品详情页的重构"
 
 ```text
 Phase 1 采集（AI 并行执行）:
-  - 历史对话: 搜索"室内位置" → 找到 4 条相关对话
-  - 相关文档: P1_配置后台重组_设计方案.md §6.5
-  - 已有规则: example-backend-prototype.mdc 命中
-  - 代码依赖: src/services/ 中位置相关模块
+  - 外挂嗅探: 检测到 .cursor/rules/ecommerce-playbook.mdc，读取项目路径和组件约束
+  - 历史对话: 搜索"商品详情" → 找到 4 条相关对话
+  - 相关文档: docs/design/商品详情页_设计方案.md §2.1
+  - 已有规则: p1-frontend-components.mdc 命中
+  - 代码依赖: src/components/Product/ 中相关模块
   - 近期变更: git log 中的相关提交
 
 Phase 2 摘要（AI 呈现）:
-  → 结构化摘要，引用设计方案 §6.5
+  → 结构化摘要，引用设计方案 §2.1
 
 Phase 3 确认（人类决策）:
-  → 用户确认："先做点位配置，用 Pencil 画布"
+  → 用户确认："先做核心购买按钮区"
 
 Phase 4a（人类选择）: 路径 A - 需要深度设计
-Phase 4b（状态转换）: 用户说"A，先讨论布局" → 附条件确认
+Phase 4b（状态转换）: 用户说"A，先讨论按钮状态逻辑" → 附条件确认
 Phase 4c（AI 推进 brainstorming，人类驱动讨论）:
-  → brainstorming 讨论三栏布局方案
-  → 检测到前端任务 → 自动加载 frontend-design + ui-ux-pro-max
+  → brainstorming 讨论无库存、预售、普通购买三种状态
+  → 检测到前端任务 → 自动加载 frontend-design
   → 用户说"方案定了" → brainstorming 退出信号
   → AI 提示"进入路径 B？" → 用户确认 → 进入 4c 实施链
-  → 加载 example-backend-prototype.mdc 规则执行
+  → 加载 p1-frontend-components.mdc 规则执行
 ```
 
-### 场景 2: 用户说"继续上次意图识别的调试"
+### 场景 2: 用户说"继续上次的支付模块调试"
 
 ```text
 Phase 1 采集（AI 并行执行）:
-  - 历史对话: 找到上次 Subject Resolver v3 Prompt 测试进度
-  - 已有规则: example-module-test.mdc 命中
+  - 历史对话: 找到上次 Stripe Webhook 签名验证的排查进度
+  - 已有规则: payment-security.mdc 命中
 
 Phase 2 摘要（AI 呈现）:
   → 上次进度、未完成项、测试结论
 
 Phase 3 确认（人类决策）:
-  → 用户确认："从 v3 Prompt 继续"
+  → 用户确认："从签名的 401 报错继续"
 
 Phase 4a（人类选择）: 路径 D - 调试排查
-Phase 4b（状态转换）: 用户说"D，从 v3 Prompt 继续" → 确认信号
+Phase 4b（状态转换）: 用户说"D，按上次说的再查" → 确认信号
 Phase 4c（AI 自主推进）:
-  → 加载 example-module-test.mdc
-  → 检测到涉及 Prompt → 自动加载 prompt-engineering skill
-  → 检测到涉及 LLM 测试 → 自动加载 llm-test-standard skill
+  → 加载 payment-security.mdc
   → systematic-debugging 四阶段排查
   → verification-before-completion 验证结果
   → 汇报测试结论
 ```
 
-### 场景 3: 用户说"新增一个翻译专家"
+### 场景 3: 用户说"新增一个报表导出功能"
 
 ```text
 Phase 1-3（人类驱动）:
-  → 采集专家层设计文档、现有专家代码结构
+  → 采集数据结构设计文档、现有报表代码结构
   → 用户确认需求和约束
 
 Phase 4a（人类选择）: 路径 B - 方案清晰，需要实施计划
 Phase 4b（状态转换）: 用户说"选 B，开始" → 确认信号
 Phase 4c（AI 全链条自主推进）:
   → writing-plans 拆解为 8 个 bite-sized 任务
-  → 检测到涉及 Prompt → 自动加载 prompt-engineering skill
-  → 检测到涉及 LLM 模块 → 自动加载 llm-test-standard skill
-  → test-driven-development 先写翻译专家测试
+  → test-driven-development 先写生成逻辑测试
   → subagent-driven-development 并行执行
   → 每 3 个任务后 requesting-code-review
   → verification-before-completion 全量测试
   → finishing-a-development-branch 提交/PR
-  → expert-doc-sync 自动触发同步销售材料（xlsx skill 生成 Excel）
 ```

@@ -40,7 +40,7 @@ alwaysApply: true
 
 ```text
 优先级 1: 本地全局路径
-  读取 ~/.cursor/rules/new-task-kickoff.mdc
+  读取 ~/.cursor/rules/new-task-kickoff.mdc （AI 自行展开 ~ 为真实用户目录）
 
 优先级 2: 环境初始化与恢复（本地不存在时）
   执行环境准备脚本:
