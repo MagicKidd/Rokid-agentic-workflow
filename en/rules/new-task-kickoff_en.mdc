@@ -59,6 +59,12 @@ Key Directories:
 Output: List of relevant document paths + one-sentence summary for each
 ```
 
+> **【Document Creation and Auto-Sync Rule】**
+> If a new design document, architecture document, or product document (e.g., `Docs/Design/xxx.md`) is created during the current task, AI **MUST automatically invoke Shell to execute sync operations** to push it to the remote project repository after the document is written or confirmed.
+> - Sync scripts/commands are usually defined in the project's `playbook.mdc` (e.g., `rokid-agent-project-playbook.mdc`), search for "sync documents to remote" or similar keywords.
+> - If no special definition exists, refer to the standard `git add / commit / push` process.
+> - This step is mandatory and does not require the user to manually trigger a "push" command.
+
 ### 1.3 Existing Rules Check
 
 ```yaml
