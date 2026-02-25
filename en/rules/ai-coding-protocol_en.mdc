@@ -1,0 +1,70 @@
+---
+description: Dynamic AI Coding Protocol (Smallest Effective Change, Read Before Write, Diff Self-Review)
+alwaysApply: true
+---
+
+# Dynamic AI Coding Protocol (Global)
+
+## Goal
+
+Provide a portable behavior protocol for AI coding in any project:
+- learn local conventions before editing;
+- make the smallest effective change;
+- keep code maintainable for humans.
+
+## Non-Negotiable Rules
+
+1. **Smallest Effective Change**
+   - Prefer the minimum diff that solves the user request.
+   - Do not refactor unrelated code unless explicitly asked.
+
+2. **Read Before Write**
+   - Before editing a module, read 2-3 nearby files in the same directory.
+   - Infer local conventions from real code, then align new changes.
+
+3. **Check Before Creating**
+   - Search for existing helpers/patterns before adding abstractions or new files.
+   - Reuse existing utilities whenever practical.
+
+4. **Diff Self-Review**
+   - Before reporting completion, inspect the diff and remove unrelated changes.
+   - If a deliberate style deviation is needed, explain why.
+
+5. **Human Maintainability First**
+   - Keep names explicit and logic straightforward.
+   - Comments explain **why**, not trivial **what**.
+
+6. **Safety Baseline**
+   - Never hardcode secrets/keys/tokens in code.
+   - Never commit credential files unless user explicitly asks.
+
+7. **Design Review Requirement**
+   - New database table creation, storage solutions, field design, component selection and configuration MUST follow existing specifications.
+   - The design scheme MUST pass a manual review within the team before implementation can begin.
+   - The interface (API) design review process follows the same requirement. AI MUST remind the user to get approval before coding.
+
+## Read-Before-Write Protocol
+
+When writing or modifying code, run this sequence:
+
+1. **Check Learned Conventions First**
+   - If a `learned-conventions.mdc` or `.agent-context/conventions.md` is available, use its pre-extracted data and **skip steps 2-3**.
+2. **Sample** (only if no learned conventions exist)
+   - Read 2-3 recent files in the target module.
+3. **Extract** (only if no learned conventions exist)
+   - Derive conventions: naming, imports, typing density, error handling, logging, test style.
+4. **Align**
+   - Follow dominant local style (frequency first, recency as tie-breaker).
+5. **Verify**
+   - Compare new code against sampled style and fix obvious mismatch.
+
+## Anti-Slop Guardrails
+
+- Avoid adding abstraction layers with only one implementation.
+- Avoid repetitive defensive checks across multiple layers for the same input.
+- Avoid utility wrappers that add no behavior.
+- Avoid broad rewrites when one focused patch is enough.
+
+## Cross-Editor Integration Hint
+
+If a project provides `AGENTS.md` and `.agent-context/*`, treat them as primary local conventions and keep this global protocol as behavioral baseline.
