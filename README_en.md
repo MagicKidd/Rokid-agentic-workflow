@@ -47,7 +47,7 @@ Clone this repository to your local machine. To include the `superpowers` submod
 # Recommended to place in a global, reusable directory
 mkdir -p ~/.cursor/skills
 cd ~/.cursor/skills
-git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git .
+git clone --recursive https://github.com/MagicKidd/Rokid-agentcode.git .
 ```
 
 ### 2. IDE Integration
