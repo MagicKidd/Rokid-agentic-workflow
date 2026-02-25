@@ -13,7 +13,9 @@
 
 在实际业务开发中，当使用 AI（如 Cursor, Claude Code）处理复杂任务时，AI 往往容易在长对话中丢失上下文，或在缺乏充分设计的情况下急于编码，导致代码过度工程或引入缺陷。
 
-**Agentic Coding Workflow** 是一套面向开发者的 AI 协作协议。它通过预定义的调度规则（Rules）和专业技能包（Skills），将任务拆解为从上下文采集、方案设计到代码实现、自动化验证的结构化步骤，从而让 AI 的协作过程更加可控和规范。
+**Rokid-agentcode** (前身为 Agentic Coding Workflow) 是一套面向开发者的 AI 协作协议。它通过预定义的调度规则（Rules）和专业技能包（Skills），将任务拆解为从上下文采集、方案设计到代码实现、自动化验证的结构化步骤，从而让 AI 的协作过程更加可控和规范。
+
+> 🔥 **[新版技术白皮书与架构全景（推荐阅读）](https://raw.githack.com/MagicKidd/Rokid-agentic-workflow/master/Agentic_Workflow_Showcase_Modern.html)** （也可下载项目后本地浏览器打开 `Agentic_Workflow_Showcase_Modern.html` 查看星系级交互架构图）
 
 ## 📖 目录
 - [核心思路](#-核心思路)
@@ -47,7 +49,7 @@
 # 建议放置在全局的可重用目录
 mkdir -p ~/.cursor/skills
 cd ~/.cursor/skills
-git clone --recursive https://github.com/Rokid/agentic-coding-workflow.git .
+git clone --recursive https://github.com/MagicKidd/Rokid-agentic-workflow.git .
 ```
 
 ### 2. IDE 适配配置

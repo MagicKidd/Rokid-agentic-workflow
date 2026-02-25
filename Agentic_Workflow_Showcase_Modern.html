@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Coding Workflow | 核心技术白皮书</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#2dd4bf', // Teal 400
+                            500: '#14b8a6', // Teal 500
+                            600: '#0d9488', // Teal 600
+                        },
+                        accent: {
+                            400: '#818cf8', // Blue 400
+                            500: '#6366f1', // Blue 500
+                            600: '#4f46e5', // Indigo 600
+                        },
+                        dark: {
+                            900: '#0a0a0f', // Deepest background
+                            800: '#13141c', // Card background
+                            700: '#1e2029', // Lighter card/border
+                            600: '#2a2d3a', // Stronger border
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'grid-pattern': 'linear-gradient(to right, #1e2029 1px, transparent 1px), linear-gradient(to bottom, #1e2029 1px, transparent 1px)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: #d1d5db; /* gray-300 */
+            line-height: 1.7;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            color: #f3f4f6; /* gray-100 */
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #2dd4bf 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout & Components */
+        .glass-card {
+            background: rgba(19, 20, 28, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(42, 45, 58, 0.8);
+            border-radius: 1rem;
+        }
+        
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(45, 212, 191, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.1);
+        }
+
+        /* Flow Diagram CSS (Replacing Mermaid) */
+        .flow-node {
+            background: #13141c;
+            border: 1px solid #2a2d3a;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .flow-node.highlight {
+            border-color: #2dd4bf;
+            box-shadow: 0 0 20px -5px rgba(45, 212, 191, 0.3);
+        }
+        
+        .flow-node.accent {
+            border-color: #818cf8;
+            box-shadow: 0 0 20px -5px rgba(129, 140, 248, 0.3);
+        }
+
+        .flow-arrow-down {
+            width: 2px;
+            height: 2rem;
+            background: #2a2d3a;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .flow-arrow-down::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: #2a2d3a transparent transparent transparent;
+        }
+
+        .flow-arrow-right {
+            height: 2px;
+            width: 2rem;
+            background: #2a2d3a;
+            position: relative;
+        }
+        
+        .flow-arrow-right::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent transparent #2a2d3a;
+        }
+
+        /* Subtle Grid Background */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: var(--tw-gradient-grid-pattern);
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        
+        /* Code Block */
+        .code-block {
+            background: #0d0e12;
+            border: 1px solid #1e2029;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500/30 selection:text-brand-300">
+
+    <!-- Fixed Nav -->
+    <nav class="fixed w-full z-50 glass-card border-t-0 border-x-0 rounded-none">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-accent-500 flex items-center justify-center font-bold text-white shadow-lg">AW</div>
+                <span class="font-bold text-lg text-white tracking-tight">Agentic Workflow <span class="text-xs text-brand-400 font-normal ml-2 border border-brand-400/30 px-2 py-0.5 rounded-full bg-brand-400/10">Whitepaper</span></span>
+            </div>
+            <div class="hidden lg:flex gap-8 text-sm font-medium">
+                <a href="#evolution" class="text-gray-400 hover:text-brand-400 transition-colors">架构演进</a>
+                <a href="#primitives" class="text-gray-400 hover:text-brand-400 transition-colors">核心原语</a>
+                <a href="#catalog" class="text-gray-400 hover:text-brand-400 transition-colors">工作流规则库</a>
+                <a href="#engine" class="text-gray-400 hover:text-brand-400 transition-colors">引擎深剖</a>
+                <a href="#fsm" class="text-gray-400 hover:text-brand-400 transition-colors">状态机原理</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-500/20 blur-[120px] rounded-full pointer-events-none mix-blend-screen"></div>
+        
+        <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-400 text-sm font-medium mb-8">
+                <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+                告别“聊着聊着代码就崩了”
+            </div>
+            
+            <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+                用流程协议接管行为<br>
+                <span class="text-gradient">重塑 AI 编程的工程纪律</span>
+            </h1>
+            
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-12">
+                这是一份面向高级研发的星系级架构说明文件。单体大模型解决不了复杂的软件工程问题。我们通过开源 <strong>Agentic Coding Workflow</strong>，把 AI 从一个“盲目打字的打字机”，驯化成了一个“有规矩、按阶段推进的系统工程师”。
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-6 pb-32 space-y-32">
+
+        <!-- 1. 架构演进 -->
+        <section id="evolution" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-brand-400">01.</span> 最先进的 AI Coding 架构演进
+            </h2>
+            <div class="prose prose-invert max-w-none text-gray-400">
+                <p class="text-lg mb-8">为了理解为什么我们需要工作流，必须先认清目前行业处于什么阶段，以及单体大模型（LLM）的瓶颈在哪里。技术演进正在经历三个截然不同的阶段：</p>
+            </div>
+
+            <!-- CSS Flow: Evolution -->
+            <div class="glass-card p-8 mt-10 relative overflow-hidden">
+                <!-- Decorative background light -->
+                <div class="absolute right-0 top-0 w-64 h-64 bg-accent-500/10 blur-[80px] rounded-full"></div>
+                
+                <div class="flex flex-col gap-6 relative z-10">
+                    <!-- Gen 1 -->
+                    <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                        <div class="flow-node w-full md:w-1/3 border-gray-700">
+                            <div class="text-xs text-gray-500 font-mono mb-1">GEN 1</div>
+                            <div class="font-bold text-gray-300">Copilot 时代</div>
+                            <div class="text-sm text-gray-500 mt-2">高级打字机</div>
+                        </div>
+                        <div class="hidden md:block flow-arrow-right"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-400"><strong>基于上下文的单点补全。</strong> IDE 插件截取光标前后的短文本，发送给模型。它只能解决“怎么写这个函数”的语法问题，完全缺乏项目全局视图，无法解决架构问题。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Gen 2 -->
+                    <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                        <div class="flow-node w-full md:w-1/3 border-gray-600">
+                            <div class="text-xs text-gray-500 font-mono mb-1">GEN 2</div>
+                            <div class="font-bold text-gray-200">Chat & RAG 时代</div>
+                            <div class="text-sm text-gray-400 mt-2">带搜索引擎的外包</div>
+                        </div>
+                        <div class="hidden md:block flow-arrow-right border-gray-600"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-400"><strong>基于检索的问答与单步修改。</strong> 通过向量搜索将相关文件拼接到 Prompt。但它缺乏纪律，收到指令就立刻动工，容易破坏分层架构。而且多轮对话后会导致严重的“失忆”与上下文污染。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Gen 3 -->
+                    <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                        <div class="flow-node highlight w-full md:w-1/3">
+                            <div class="text-xs text-brand-400 font-mono mb-1">GEN 3 (We are here)</div>
+                            <div class="font-bold text-white">Agentic Workflow</div>
+                            <div class="text-sm text-brand-300 mt-2">有纪律的系统工程师</div>
+                        </div>
+                        <div class="hidden md:block flow-arrow-right !bg-brand-500"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-300"><strong>引入状态机、多智能体与工具链。</strong> 模型不再是直接的代码生成器，而是被嵌入到一个有严格规则控制的工作流中。人类只做高层架构决策，AI 负责底层的脏活累活并强制闭环验证。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 p-4 bg-brand-500/10 border border-brand-500/20 rounded-lg text-brand-100 text-sm">
+                <strong>核心论点：</strong> 单体大模型解决不了复杂的软件工程问题，我们需要的不是更聪明的大模型，而是“控制大模型行为的架构协议”。
+            </div>
+        </section>
+
+        <!-- 2. 解构三剑客 -->
+        <section id="primitives" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-brand-400">02.</span> 解构三剑客：Agent / Rules / Skills
+            </h2>
+            <div class="prose prose-invert max-w-none text-gray-400 mb-10">
+                <p>很多开发者对 AI 概念混淆不清。在我们的架构中，必须用 <strong>软件工程的语言</strong> 重新定义它们，消除抽象感。</p>
+            </div>
+
+            <!-- CSS Architecture Diagram -->
+            <div class="glass-card p-8 relative">
+                <h3 class="text-sm font-mono text-gray-500 mb-8 text-center uppercase tracking-widest">The Core Primitives Architecture</h3>
+                
+                <div class="flex flex-col lg:flex-row gap-8 items-stretch justify-center">
+                    
+                    <!-- Rules Block -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="flow-node border-red-500/30 bg-red-500/5 hover:border-red-500/60 h-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-red-400 font-bold text-lg">Rules (规则)</h4>
+                                <span class="text-xs font-mono bg-red-500/20 text-red-300 px-2 py-1 rounded">静态宪法</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">被动触发的、声明式（Declarative）的约束条件（如 `.mdc` 文件）。</p>
+                            <div class="text-xs text-gray-500 bg-black/40 p-3 rounded border border-gray-800">
+                                <strong>作用：</strong>定义系统的边界与红线。<br>
+                                <strong>类比：</strong>项目中的 Linter 和团队架构规范手册。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Agent Block -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative">
+                        <!-- Connecting lines (desktop) -->
+                        <div class="hidden lg:block absolute left-0 top-1/2 w-8 border-t border-dashed border-gray-600 -translate-x-full"></div>
+                        <div class="hidden lg:block absolute right-0 top-1/2 w-8 border-t border-dashed border-gray-600 translate-x-full"></div>
+                        
+                        <div class="flow-node highlight bg-brand-900/20 text-center w-full relative z-10">
+                            <div class="w-12 h-12 bg-brand-500/20 rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-500/40">
+                                <svg class="w-6 h-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <h4 class="text-white font-bold text-lg mb-1">Main Agent</h4>
+                            <div class="text-xs font-mono text-brand-400 mb-3">Orchestrator</div>
+                            <p class="text-xs text-gray-400">作为网关和项目经理，负责接受 Rules 监督，拆解任务，分配执行。</p>
+                        </div>
+                        
+                        <!-- Down arrow to subagents -->
+                        <div class="flow-arrow-down mt-4 hidden lg:block"></div>
+                    </div>
+
+                    <!-- Skills Block -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="flow-node border-blue-500/30 bg-blue-500/5 hover:border-blue-500/60 h-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-blue-400 font-bold text-lg">Skills (技能)</h4>
+                                <span class="text-xs font-mono bg-blue-500/20 text-blue-300 px-2 py-1 rounded">动态 SOP</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">主动加载的、命令式（Imperative）的执行手册（如 TDD）。</p>
+                            <div class="text-xs text-gray-500 bg-black/40 p-3 rounded border border-gray-800">
+                                <strong>作用：</strong>赋予 AI 特定领域的专业方法论。<br>
+                                <strong>类比：</strong>某项业务的标准化操作指南。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subagents Cluster -->
+                <div class="mt-8 border border-gray-800 rounded-xl p-6 bg-black/20">
+                    <h4 class="text-center text-sm font-bold text-gray-400 mb-6">Subagents (并发执行集群 / 微服务)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flow-node text-center !p-4 border-gray-700 hover:border-gray-500">
+                            <div class="text-sm font-bold text-gray-300">Subagent A</div>
+                            <div class="text-xs text-gray-500">探索前端架构</div>
+                        </div>
+                        <div class="flow-node text-center !p-4 border-gray-700 hover:border-gray-500">
+                            <div class="text-sm font-bold text-gray-300">Subagent B</div>
+                            <div class="text-xs text-gray-500">分析后端 API</div>
+                        </div>
+                        <div class="flow-node text-center !p-4 border-gray-700 hover:border-gray-500">
+                            <div class="text-sm font-bold text-gray-300">Subagent C</div>
+                            <div class="text-xs text-gray-500">编写测试用例</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 mt-4">由主代理派生出，具有独立上下文。实现**分而治之，隔离污染**，防止长文本导致的记忆混乱。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 工作流规则库全景 -->
+        <section id="catalog" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-brand-400">03.</span> 规则库与技能树矩阵 (The Catalog)
+            </h2>
+            <div class="prose prose-invert max-w-none text-gray-400 mb-10">
+                <p class="text-lg">基于我们在开源仓库 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">/zh</code> 目录下的最新结构，我们构建的并非一段 Prompt，而是一个精密如游戏技能树的“法则矩阵”。它们覆盖了软件生命周期的每个角落。</p>
+            </div>
+
+            <!-- Ecosystem Structure Diagram -->
+            <div class="glass-card p-6 mb-16 bg-dark-900/40 border-gray-700">
+                <h3 class="text-sm font-mono text-brand-400 mb-8 text-center uppercase tracking-widest border-b border-gray-800 pb-4">全生态依赖结构图 (Ecosystem Architecture)</h3>
+                
+                <div class="flex flex-col items-center">
+                    <!-- Layer 1: Triggers & Config -->
+                    <div class="flex gap-8 sm:gap-24 w-full max-w-2xl justify-center mb-0 relative">
+                        <div class="flow-node text-center w-48 !p-3 border-yellow-500/50 bg-yellow-500/10 hover:border-yellow-400 transition-colors">
+                            <div class="text-xs font-mono text-yellow-400 font-bold mb-1">new-task-trigger</div>
+                            <div class="text-[10px] text-gray-400">意图雷达嗅探器</div>
+                        </div>
+                        <div class="flow-node text-center w-48 !p-3 border-yellow-500/50 bg-yellow-500/10 hover:border-yellow-400 transition-colors">
+                            <div class="text-xs font-mono text-yellow-400 font-bold mb-1">[项目]-playbook</div>
+                            <div class="text-[10px] text-gray-400">项目环境与依赖挂载</div>
+                        </div>
+                    </div>
+
+                    <!-- Connectors down -->
+                    <div class="flex gap-8 sm:gap-24 w-full max-w-2xl justify-center mb-0 relative">
+                        <div class="w-48 flex justify-center"><div class="flow-arrow-down !h-8 !border-gray-600"></div></div>
+                        <div class="w-48 flex justify-center"><div class="flow-arrow-down !h-8 !border-gray-600"></div></div>
+                    </div>
+
+                    <!-- Layer 2: The Gatekeeper -->
+                    <div class="w-full max-w-md mb-0 relative z-10">
+                        <div class="flow-node text-center !p-4 border-red-500/60 bg-red-500/10 shadow-[0_0_20px_-5px_rgba(239,68,68,0.2)] hover:border-red-400 transition-colors">
+                            <div class="text-sm font-mono text-red-400 font-bold mb-1">new-task-kickoff.mdc</div>
+                            <div class="text-xs text-gray-300">核心总控与状态机引擎 (The Gatekeeper)</div>
+                        </div>
+                    </div>
+
+                    <!-- Connectors down -->
+                    <div class="w-full max-w-md flex justify-center mb-0 relative">
+                        <div class="flow-arrow-down !h-8 !border-gray-600"></div>
+                    </div>
+
+                    <!-- Layer 3: The Constitution -->
+                    <div class="w-full max-w-xl mb-0 relative z-10">
+                        <div class="flow-node text-center !p-4 border-orange-500/50 bg-orange-500/10 hover:border-orange-400 transition-colors">
+                            <div class="text-sm font-mono text-orange-400 font-bold mb-1">ai-coding-protocol & core-engineering-principles</div>
+                            <div class="text-xs text-gray-300">全局工程纪律底线 (The Constitution)</div>
+                        </div>
+                    </div>
+
+                    <!-- Connectors to Skills -->
+                    <div class="w-full flex justify-center mb-0 relative">
+                        <div class="w-[80%] border-t border-gray-600 mt-6 relative">
+                            <!-- Vertical lines going up from the horizontal bar to Constitution -->
+                            <div class="absolute left-1/2 bottom-0 w-px h-6 bg-gray-600"></div>
+                            
+                            <!-- Vertical lines going down to Skills -->
+                            <div class="absolute left-0 top-0 w-px h-6 bg-gray-600"></div>
+                            <div class="absolute left-1/4 top-0 w-px h-6 bg-gray-600"></div>
+                            <div class="absolute left-1/2 top-0 w-px h-6 bg-gray-600"></div>
+                            <div class="absolute right-1/4 top-0 w-px h-6 bg-gray-600"></div>
+                            <div class="absolute right-0 top-0 w-px h-6 bg-gray-600"></div>
+                            
+                            <!-- Arrows at the end of vertical lines -->
+                            <div class="absolute left-0 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-600"></div>
+                            <div class="absolute left-1/4 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-600"></div>
+                            <div class="absolute left-1/2 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-600"></div>
+                            <div class="absolute right-1/4 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-600"></div>
+                            <div class="absolute right-0 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-600"></div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 4: Skills Array -->
+                    <div class="w-full grid grid-cols-5 gap-2 sm:gap-4 mt-6 relative z-10 text-center px-4">
+                        <div class="bg-blue-900/20 border border-blue-500/30 rounded p-2 sm:p-3 hover:bg-blue-900/40 transition-colors">
+                            <div class="text-[10px] sm:text-xs font-bold text-blue-400 mb-1">工作流域</div>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400">TDD / Subagent<br>Plan / Brainstorm</div>
+                        </div>
+                        <div class="bg-purple-900/20 border border-purple-500/30 rounded p-2 sm:p-3 hover:bg-purple-900/40 transition-colors">
+                            <div class="text-[10px] sm:text-xs font-bold text-purple-400 mb-1">架构域</div>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400">Architecture<br>Frontend / Prompt</div>
+                        </div>
+                        <div class="bg-pink-900/20 border border-pink-500/30 rounded p-2 sm:p-3 hover:bg-pink-900/40 transition-colors">
+                            <div class="text-[10px] sm:text-xs font-bold text-pink-400 mb-1">专家域</div>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400">Collaboration<br>Debate / Cognition</div>
+                        </div>
+                        <div class="bg-teal-900/20 border border-teal-500/30 rounded p-2 sm:p-3 hover:bg-teal-900/40 transition-colors">
+                            <div class="text-[10px] sm:text-xs font-bold text-teal-400 mb-1">防错域</div>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400">Kaizen<br>Documentation</div>
+                        </div>
+                        <div class="bg-emerald-900/20 border border-emerald-500/30 rounded p-2 sm:p-3 hover:bg-emerald-900/40 transition-colors">
+                            <div class="text-[10px] sm:text-xs font-bold text-emerald-400 mb-1">生态域</div>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400">Creator / Find<br>Dynamic Context</div>
+                        </div>
+                    </div>
+
+                    <!-- Connectors to Scripts -->
+                    <div class="w-full flex justify-center mt-4 mb-0 relative">
+                        <div class="w-[80%] border-t border-dashed border-gray-700 relative">
+                            <!-- Vertical lines going down from skills -->
+                            <div class="absolute left-0 bottom-0 w-px h-4 bg-gray-700 border-dashed"></div>
+                            <div class="absolute left-1/4 bottom-0 w-px h-4 bg-gray-700 border-dashed"></div>
+                            <div class="absolute left-1/2 bottom-0 w-px h-4 bg-gray-700 border-dashed"></div>
+                            <div class="absolute right-1/4 bottom-0 w-px h-4 bg-gray-700 border-dashed"></div>
+                            <div class="absolute right-0 bottom-0 w-px h-4 bg-gray-700 border-dashed"></div>
+                            
+                            <!-- Arrow down to scripts -->
+                            <div class="absolute left-1/2 top-0 w-px h-6 bg-gray-700 border-dashed"></div>
+                            <div class="absolute left-1/2 top-6 -ml-[3px] border-solid border-[3px] border-transparent border-t-gray-700"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Layer 5: Scripts/Plugins -->
+                    <div class="w-full max-w-sm mt-6 relative z-10">
+                        <div class="bg-black/60 border border-gray-700 border-dashed rounded p-3 text-center flex items-center justify-center gap-3">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <div class="text-xs text-gray-400">底层能力支撑脚本 (Python / Shell / CLI)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Grid -->
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> 核心规则系 (Rules) - 静态宪法</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+                <div class="glass-card p-5 border-l-2 border-l-red-500 hover:border-red-500/50 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="text-base font-bold text-white font-mono">new-task-kickoff.mdc</h4>
+                        <span class="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded">核心总控</span>
+                    </div>
+                    <p class="text-xs text-gray-400">任务启动的绝对入口。强制挂起 AI，执行 4 阶段的流转与上下文收集。</p>
+                </div>
+                <div class="glass-card p-5 border-l-2 border-l-orange-500 hover:border-orange-500/50 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="text-base font-bold text-white font-mono">ai-coding-protocol.mdc</h4>
+                        <span class="text-[10px] bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded">纪律基线</span>
+                    </div>
+                    <p class="text-xs text-gray-400">无论处于何种状态都必须遵守的底线：最小化变更、先读后写、差异自审。</p>
+                </div>
+                <div class="glass-card p-5 border-l-2 border-l-yellow-500 hover:border-yellow-500/50 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="text-base font-bold text-white font-mono">new-task-trigger.mdc</h4>
+                        <span class="text-[10px] bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded">意图嗅探</span>
+                    </div>
+                    <p class="text-xs text-gray-400">智能监听用户对话，识别“新需求/新设计”等意图，自动加载并触发 kickoff 流程。</p>
+                </div>
+                <div class="glass-card p-5 border-l-2 border-l-emerald-500 hover:border-emerald-500/50 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="text-base font-bold text-white font-mono">core-engineering-principles.mdc</h4>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">架构底座</span>
+                    </div>
+                    <p class="text-xs text-gray-400">定义系统设计的核心原则（如高内聚低耦合），为 AI 架构选型提供底层价值观。</p>
+                </div>
+            </div>
+
+            <!-- Skills Categorized -->
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> 动态能力域 (15 大开源 Skills 矩阵)</h3>
+            
+            <div class="space-y-6">
+                <!-- Group 1 -->
+                <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                    <h5 class="text-sm font-bold text-gray-300 mb-3 border-b border-gray-800 pb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> 核心开发与工作流
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="font-mono text-xs text-blue-300 font-bold mb-1">test-driven-development</div>
+                            <p class="text-xs text-gray-500">TDD 测试驱动。功能实现前，强制先写必败的测试（Red），再写实现（Green），保证覆盖率。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-blue-300 font-bold mb-1">subagent-driven-development</div>
+                            <p class="text-xs text-gray-500">遇到独立多任务时，主 Agent 派生出多个微服务级别的 Subagent 并发探索或编码，最后汇总验证。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-blue-300 font-bold mb-1">planning-with-files</div>
+                            <p class="text-xs text-gray-500">大工程文件级规划。自动生成任务流快照（task_plan, progress），确保断点可恢复。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-blue-300 font-bold mb-1">brainstorming</div>
+                            <p class="text-xs text-gray-500">在真正敲击代码前，强制展开头脑风暴。通过苏格拉底式追问，澄清业务模糊地带。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 2 -->
+                <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                    <h5 class="text-sm font-bold text-gray-300 mb-3 border-b border-gray-800 pb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> 架构、前端与提示工程
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <div class="font-mono text-xs text-purple-300 font-bold mb-1">software-architecture</div>
+                            <p class="text-[11px] text-gray-500">基于 Clean Architecture 的系统设计指导。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-purple-300 font-bold mb-1">frontend-design</div>
+                            <p class="text-[11px] text-gray-500">生产级前端界面与 UI 组件的专业设计生成。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-purple-300 font-bold mb-1">prompt-engineering</div>
+                            <p class="text-[11px] text-gray-500">针对 LLM 交互的生产级提示词优化范式。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 3 -->
+                <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                    <h5 class="text-sm font-bold text-gray-300 mb-3 border-b border-gray-800 pb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-pink-500"></span> 专家认知与协作系统
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <div class="font-mono text-xs text-pink-300 font-bold mb-1">expert-collaboration</div>
+                            <p class="text-[11px] text-gray-500">拉起产品、技术、QA 等多角色分工合作模式。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-pink-300 font-bold mb-1">expert-debate</div>
+                            <p class="text-[11px] text-gray-500">方案分歧时，强制两位专家进行三轮论证辩论。</p>
+                        </div>
+                        <div>
+                            <div class="font-mono text-xs text-pink-300 font-bold mb-1">internalized-cognition</div>
+                            <p class="text-[11px] text-gray-500">“成为系统”，以第一人称内化视角洞察复杂链路。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 4 -->
+                <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                    <h5 class="text-sm font-bold text-gray-300 mb-3 border-b border-gray-800 pb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-teal-500"></span> 工程防错与生态扩展
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <div class="font-mono text-xs text-teal-300 font-bold mb-1">kaizen</div>
+                                <p class="text-[11px] text-gray-500">持续改进与防错设计（Poka-Yoke），拒绝过度工程。</p>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-mono text-xs text-teal-300 font-bold mb-1">project-documentation</div>
+                                <p class="text-[11px] text-gray-500">标准化 README、CLAUDE.md 及开发指南生成。</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <div class="font-mono text-xs text-emerald-300 font-bold mb-1">skill-creator & find-skills</div>
+                                <p class="text-[11px] text-gray-500">为社区创造新能力，或在海量库中检索并安全审核可用插件。</p>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-mono text-xs text-emerald-300 font-bold mb-1">dynamic-agent-context</div>
+                                <p class="text-[11px] text-gray-500">自动学习并刷新当前代码库的独有约定，反哺上下文。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 源码级深剖：核心规则逐行拆解 -->
+        <section id="engine" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-brand-400">04.</span> 源码级深剖：核心规则逐行拆解
+            </h2>
+            <div class="prose prose-invert max-w-none text-gray-400 mb-10">
+                <p class="text-lg">听众可能会好奇：你凭什么能“卡死”不可控的大模型？我们不谈虚的，直接翻开这两份“圣经”的源码，一步一步拆解黑魔法是如何通过改变底层 Logits 分布来生效的。</p>
+            </div>
+
+            <div class="space-y-12">
+                
+                <!-- Engine 1 Deep Dive -->
+                <div class="glass-card p-0 overflow-hidden relative">
+                    <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500/10 blur-[80px] rounded-full"></div>
+                    <div class="p-8 relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-400 text-xs font-mono font-bold mb-4">
+                            Engine Alpha
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">The Gatekeeper：“守门人”引擎</h3>
+                        <p class="text-sm font-mono text-gray-500 mb-6 border-b border-gray-800 pb-4">FILE: <code class="text-brand-300">new-task-kickoff.mdc</code></p>
+                        
+                        <p class="text-sm text-gray-400 mb-6">大模型有一种天生的“生成冲动”（Generative Urge），看到需求就忍不住敲代码。守门人的唯一职责，就是在代码生成的入口处布下四道关卡，强行将其从“生成态”打断为“挂起态”。</p>
+
+                        <!-- Phase Breakdown -->
+                        <div class="space-y-6">
+                            
+                            <!-- Phase 1 -->
+                            <div class="border border-gray-700 bg-black/40 rounded-lg p-5">
+                                <h4 class="text-brand-400 font-bold mb-3 flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded bg-brand-500/20 text-center leading-5 text-sm">1</span> 强制上下文嗅探 (Phase 1)
+                                </h4>
+                                <p class="text-sm text-gray-400 mb-3">当接收到新任务，AI 绝对不允许立刻作答。源码要求它必须在后台静默调用系统命令，执行六重扫描：</p>
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-gray-300 border border-gray-700">1.0 嗅探 `plugin_hook` 提取架构配置</div>
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-gray-300 border border-gray-700">1.1 检索历史对话 `agent-transcripts/`</div>
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-gray-300 border border-gray-700">1.2 匹配系统核心设计文档</div>
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-gray-300 border border-gray-700">1.4 分析涉及的核心源代码模块</div>
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-gray-300 border border-gray-700">1.5 `git log --oneline -20` 近期变更</div>
+                                    <div class="bg-dark-800 p-2 rounded text-xs text-brand-300 border border-brand-500/30 bg-brand-500/5">1.6 提取双层记忆教训 `lessons.md`</div>
+                                </div>
+                                <p class="text-[11px] text-gray-500 italic">注：特别是 1.6 步。昨天排查踩的坑写进 lessons，今天全团队的 AI 都会自动避开，形成“自我进化的群体大脑”。</p>
+                            </div>
+
+                            <!-- Phase 2 & 3 -->
+                            <div class="border border-brand-500/40 bg-brand-900/10 rounded-lg p-5 relative shadow-[0_0_15px_-3px_rgba(45,212,191,0.15)]">
+                                <div class="absolute right-3 top-3 text-[10px] bg-red-500/20 text-red-400 px-2 py-1 rounded font-bold">The Blocking Point</div>
+                                <h4 class="text-brand-400 font-bold mb-3 flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded bg-brand-500 text-dark-900 text-center leading-5 text-sm">2&3</span> 强制挂起与人类决策 (Phase 2 & 3)
+                                </h4>
+                                <p class="text-sm text-gray-300 mb-3">这是最致命的“黑魔法”。我们通过注入高优先级的**元指令（Meta-prompts）**，改变了大模型的 Logit 概率分布：</p>
+                                <div class="code-block p-4 mb-3 border-brand-500/30">
+                                    <span class="text-gray-500">/* 摘自 new-task-kickoff.mdc 源码 */</span><br>
+                                    <span class="text-red-400 font-bold">AI 在此阶段只回答问题、提供信息，绝不主动推进。</span><br>
+                                    必须强制输出：我们要先讨论设计，还是直接出拆解计划？<br>
+                                    <span class="text-yellow-300">等待用户敲定...</span>
+                                </div>
+                                <p class="text-sm text-gray-400">它迫使 AI 把刚搜集的情报汇编成“待确认项”抛给你。**高维度的架构决策，永远必须人类来做。**</p>
+                            </div>
+
+                            <!-- Phase 4 -->
+                            <div class="border border-gray-700 bg-black/40 rounded-lg p-5">
+                                <h4 class="text-brand-400 font-bold mb-3 flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded bg-brand-500/20 text-center leading-5 text-sm">4</span> 智能路由分发与执行链 (Phase 4)
+                                </h4>
+                                <p class="text-sm text-gray-400 mb-3">当人类下达“通行证”（如说“选B，直接写计划”），守门人立刻放行，并动态路由：</p>
+                                <ul class="text-sm text-gray-300 space-y-2 list-none p-0 mb-4">
+                                    <li><span class="text-brand-500">➜ 路径 A：</span> 唤起 <code>brainstorming</code> 进行深度设计。</li>
+                                    <li><span class="text-brand-500">➜ 路径 B：</span> 唤起 <code>writing-plans</code> 拆解任务，然后切入 <code>TDD</code> 编码。</li>
+                                    <li><span class="text-brand-500">➜ 路径 D：</span> 唤起 <code>systematic-debugging</code> 走四阶排错流程。</li>
+                                </ul>
+                                <div class="bg-gray-800/50 p-3 rounded border border-gray-700 text-xs text-gray-400 flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    <span><strong>模型成本调度策略：</strong> 源码中定义了严格的层级。设计与审查任务强制使用 Opus（T1）；大量代码生成使用 Codex（T2）；机械的搜索与 Git 动作，强制降级派发给低成本的 Fast 模型（T4）静默执行。</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Engine 2 Deep Dive -->
+                <div class="glass-card p-0 overflow-hidden relative border-t-4 border-t-accent-500">
+                    <div class="absolute left-0 bottom-0 w-64 h-64 bg-accent-500/10 blur-[80px] rounded-full"></div>
+                    <div class="p-8 relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent-500/30 bg-accent-500/10 text-accent-400 text-xs font-mono font-bold mb-4">
+                            Engine Beta
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">The Constitution：“钢铁纪律”引擎</h3>
+                        <p class="text-sm font-mono text-gray-500 mb-6 border-b border-gray-800 pb-4">FILE: <code class="text-accent-300">ai-coding-protocol.mdc</code></p>
+                        
+                        <p class="text-sm text-gray-400 mb-6">如果说守门人负责管入口，那么最高宪法则负责管全程。它是 <code>alwaysApply: true</code> 的全局规则，如同紧箍咒一样套在主 Agent 头上，防范其在漫长链路中出现幻觉、过度工程或代码污染。</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Rule 1: Auto Init Process -->
+                            <div class="bg-dark-900 border border-gray-800 rounded-lg p-5 md:col-span-2 relative border-l-4 border-l-accent-500 shadow-[0_0_15px_-3px_rgba(99,102,241,0.1)]">
+                                <div class="absolute right-3 top-3 bg-accent-500/20 text-accent-300 text-[10px] px-2 py-0.5 rounded font-bold">The Auto-Init Sequence</div>
+                                <h4 class="text-accent-400 font-bold mb-3 text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    1. 自动初始化流程：代码编写前的 5 步强制挂载
+                                </h4>
+                                <p class="text-xs text-gray-300 mb-4">大模型决不能“凭空猜测”项目规范。最高宪法规定，在每次发生代码编写前，AI 必须在后台暗中执行一套不可跳过的 <strong>Read-Before-Write 自动初始化流程</strong>，确保代码风格 100% 无缝融入原仓库：</p>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                                    <div class="bg-dark-800 border border-gray-700 rounded p-2 text-center flex flex-col">
+                                        <span class="text-[10px] font-bold text-accent-400 mb-1">Step 1: Check</span>
+                                        <span class="text-[10px] text-gray-400 leading-tight">优先嗅探是否已有 <code class="text-gray-300">learned-conventions</code> 基线字典</span>
+                                    </div>
+                                    <div class="bg-dark-800 border border-gray-700 rounded p-2 text-center flex flex-col">
+                                        <span class="text-[10px] font-bold text-accent-400 mb-1">Step 2: Sample</span>
+                                        <span class="text-[10px] text-gray-400 leading-tight">若无字典，强制暗中读取同目录 2-3 个真实文件</span>
+                                    </div>
+                                    <div class="bg-dark-800 border border-gray-700 rounded p-2 text-center flex flex-col">
+                                        <span class="text-[10px] font-bold text-accent-400 mb-1">Step 3: Extract</span>
+                                        <span class="text-[10px] text-gray-400 leading-tight">现场提炼错误处理、日志习惯与类型密度</span>
+                                    </div>
+                                    <div class="bg-dark-800 border border-gray-700 rounded p-2 text-center flex flex-col">
+                                        <span class="text-[10px] font-bold text-accent-400 mb-1">Step 4: Align</span>
+                                        <span class="text-[10px] text-gray-400 leading-tight">按出现频率覆盖 AI 自带的“大众风格”</span>
+                                    </div>
+                                    <div class="bg-dark-800 border border-gray-700 rounded p-2 text-center flex flex-col">
+                                        <span class="text-[10px] font-bold text-green-400 mb-1">Step 5: Verify</span>
+                                        <span class="text-[10px] text-gray-400 leading-tight">动笔后一致性校验，修正一切突兀语法</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rule 2 -->
+                            <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                                <h4 class="text-accent-400 font-bold mb-2 text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    2. 最小有效变更 (Smallest Effective Diff)
+                                </h4>
+                                <p class="text-xs text-gray-400">大模型喜欢“借题发挥”。宪法严令：“偏好能解决请求的最小改动，除非被明确要求，绝对不要重构无关代码”。</p>
+                            </div>
+
+                            <!-- Rule 3 -->
+                            <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                                <h4 class="text-accent-400 font-bold mb-2 text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    3. 严禁盲造轮子 (Check Before Creating)
+                                </h4>
+                                <p class="text-xs text-gray-400">在创建任何新的抽象类或工具文件前，必须强制全库检索有没有现成的 Utilities 或 Helper 可以复用。</p>
+                            </div>
+
+                            <!-- Rule 4 -->
+                            <div class="bg-dark-900 border border-gray-800 rounded-lg p-5">
+                                <h4 class="text-accent-400 font-bold mb-2 text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    4. 交卷前自查 (Diff Self-Review)
+                                </h4>
+                                <p class="text-xs text-gray-400">在告诉用户“任务完成了”之前，AI 必须暗中运行命令检查自己的 <code>git diff</code>，清理多余的换行、冗余的 Import 或临时日志，最终才能交付干净的代码。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 状态机原理 -->
+        <section id="fsm" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-brand-400">05.</span> 四阶段状态机运转 (FSM)
+            </h2>
+            <div class="prose prose-invert max-w-none text-gray-400 mb-10">
+                <p class="text-lg">单体 LLM 总是倾向于“一次性吐出所有代码”，这是导致幻觉和架构崩塌的元凶。这套工作流的本质是一个<strong>有限状态机（Finite State Machine）</strong>。通过上述“核心规则”的协同发力，我们将大模型的执行切分为 4 个严格的生命周期。下面是它的完整运转原理与核心价值：</p>
+            </div>
+
+            <!-- CSS FSM Diagram -->
+            <div class="glass-card p-8 bg-dark-900/50">
+                <div class="flex flex-col items-center max-w-3xl mx-auto">
+                    
+                    <!-- Phase 1 -->
+                    <div class="w-full border border-gray-700 rounded-xl p-6 bg-dark-800 relative shadow-lg hover:border-gray-500 transition-colors">
+                        <div class="absolute -left-3 -top-3 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-sm text-white border border-gray-600">1</div>
+                        <div class="absolute right-4 top-4 text-[10px] font-mono bg-gray-800 text-gray-400 border border-gray-700 px-2 py-1 rounded flex gap-1">
+                            <span>new-task-trigger</span>
+                            <span>playbook</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-2 text-center text-lg">Phase 1: 谋定而后动 (强制采集态)</h4>
+                        <p class="text-xs text-gray-400 text-center mb-4 leading-relaxed">触发器截获意图后，大模型被<strong>剥夺代码生成权</strong>。强制根据 Playbook 的指引，在后台静默完成全景上下文的拼装。</p>
+                        
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <span class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-gray-300">嗅探项目环境配置</span>
+                            <span class="px-3 py-1.5 bg-gray-800 border border-brand-500/30 rounded text-xs text-brand-300 shadow-[0_0_10px_-2px_rgba(45,212,191,0.2)]">读取 lessons.md (双层记忆)</span>
+                            <span class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded text-xs text-gray-300">扫描周边代码与文档</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-700/50 text-center">
+                            <span class="text-[11px] font-bold text-gray-300">💡 核心价值：消除幻觉，确保基于“真实全库视图”而非“金鱼记忆”开局。</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Transition -->
+                    <div class="h-12 flex items-center justify-center relative">
+                        <div class="w-0.5 h-full bg-brand-500/50"></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 bg-dark-900 px-3 py-1 text-[11px] text-brand-400 whitespace-nowrap border border-brand-500/30 rounded font-bold shadow-[0_0_10px_-2px_rgba(45,212,191,0.2)]">汇总情报，主动挂起</div>
+                    </div>
+
+                    <!-- Phase 2/3 -->
+                    <div class="w-full border-2 border-brand-500/40 rounded-xl p-6 bg-brand-900/10 relative shadow-[0_0_30px_-5px_rgba(20,184,166,0.2)]">
+                        <div class="absolute -left-3 -top-3 w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center font-bold text-sm text-white shadow-lg">2,3</div>
+                        <div class="absolute right-4 top-4 text-[10px] font-mono bg-brand-900 border border-brand-500/30 text-brand-300 px-2 py-1 rounded">new-task-kickoff</div>
+                        
+                        <h4 class="text-brand-300 font-bold mb-2 text-center text-lg">Phase 2 & 3: 架构决策点 (挂起态 / HITL)</h4>
+                        <p class="text-xs text-brand-200/70 text-center mb-5">由“系统指挥官”拦截器强行制造的阻塞点（Blocking Point）。AI 不许动，必须让人类下达高维架构指令。</p>
+                        
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="px-5 py-2.5 bg-dark-800 border border-brand-500/40 rounded text-sm text-white w-4/5 text-center">输出《任务上下文调研报告》并列出待确认项</div>
+                            <div class="flow-arrow-down !h-5 !bg-brand-500/50"></div>
+                            <div class="px-5 py-2.5 bg-brand-500/20 border border-brand-400 rounded text-sm text-white w-4/5 text-center animate-pulse font-bold shadow-[0_0_15px_-2px_rgba(45,212,191,0.4)]">向人类抛出架构路径选择，原地挂起 (Suspend)</div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-brand-500/20 text-center">
+                            <span class="text-[11px] font-bold text-brand-200">💡 核心价值：Human-in-the-loop。把 AI 从“盲目写代码的外包”变成“提供方案的参谋”，避免南辕北辙的重构。</span>
+                        </div>
+                    </div>
+
+                    <!-- Transition -->
+                    <div class="h-12 flex items-center justify-center relative">
+                        <div class="w-0.5 h-full bg-accent-500/50"></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 bg-dark-900 px-3 py-1 text-[11px] text-accent-400 whitespace-nowrap border border-accent-500/30 rounded font-bold shadow-[0_0_10px_-2px_rgba(99,102,241,0.2)]">人类拍板，释放通行证</div>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="w-full border border-accent-500/40 rounded-xl p-6 bg-dark-800 relative shadow-[0_0_20px_-5px_rgba(99,102,241,0.15)]">
+                        <div class="absolute -left-3 -top-3 w-8 h-8 rounded-full bg-accent-600 flex items-center justify-center font-bold text-sm text-white border border-accent-500">4</div>
+                        <div class="absolute right-4 top-4 text-[10px] font-mono bg-accent-900/50 border border-accent-500/30 text-accent-300 px-2 py-1 rounded flex gap-1">
+                            <span>ai-coding-protocol</span>
+                            <span>Skills Array</span>
+                        </div>
+
+                        <h4 class="text-white font-bold mb-2 text-center text-lg">Phase 4: 动态路由与自治执行 (执行态)</h4>
+                        <p class="text-xs text-gray-400 text-center mb-5">收到人类的指令后，大模型终于被允许生成代码。但它必须在“最高宪法”的注视下，动态挂载专业技能 SOP 推进工作。</p>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="flex flex-wrap justify-center gap-2 mb-4">
+                                <span class="px-3 py-1.5 bg-accent-900/30 border border-accent-500/40 rounded text-xs text-accent-300">挂载 Auto-Init对齐</span>
+                                <span class="px-3 py-1.5 bg-blue-900/30 border border-blue-500/40 rounded text-xs text-blue-300">挂载 TDD 技能</span>
+                                <span class="px-3 py-1.5 bg-purple-900/30 border border-purple-500/40 rounded text-xs text-purple-300">唤起 Code Reviewer</span>
+                            </div>
+                            <div class="w-full p-4 bg-black/50 border border-gray-700 rounded-lg text-center">
+                                <span class="text-sm font-bold text-green-400 flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    强制闭环：跑通测试并自审 Diff，才可交付
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-gray-700/50 text-center">
+                            <span class="text-[11px] font-bold text-accent-300">💡 核心价值：确定性交付。告别残缺代码，通过“纪律宪法 + 技能挂载”，确保每行代码极度贴合原仓库且 100% 跑通。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-dark-900 font-bold rounded-full hover:bg-gray-200 transition-colors shadow-lg shadow-white/10">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                    获取开源配置，将其植入你的现有项目
+                </a>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="border-t border-dark-600 py-12 bg-dark-900 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-600 text-sm">
+            <p>© 2026 Agentic Coding Workflow. Designed for Senior Engineers.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
