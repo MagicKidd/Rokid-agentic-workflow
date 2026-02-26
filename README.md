@@ -1,4 +1,4 @@
-# Rokid-agentcode (原 Agentic Coding Workflow)
+# Rokid Agentic Coding
 
 <p align="center">
   <img src="https://img.shields.io/badge/Agentic-Workflow-blue.svg" alt="Agentic Workflow">
