@@ -1,7 +1,7 @@
 ---
 name: planning-with-files
 version: "2.10.0"
-description: 基于文件的任务追踪系统，创建 task_plan.md/findings.md/progress.md 三件套来持久化计划与进展。仅在以下场景使用：(1) 需要跨会话恢复的长周期研究型任务；(2) 需要文件级进度追踪的多阶段调研（>5 步且涉及信息收集与分析）。不适用于：单次实施计划（用 writing-plans）、已有明确步骤的执行（用 executing-plans）、或 ≤5 步的常规开发任务。触发词：研究计划、多会话任务、task_plan、findings、progress。
+description: File-based task-tracking system using task_plan.md / findings.md / progress.md as persistent working memory on disk. Use ONLY for: (1) long-horizon research tasks that must survive session restarts; (2) multi-phase investigations (>5 steps involving information gathering and analysis) where file-level progress tracking matters. NOT for: a single implementation plan (use writing-plans), executing a plan with clear steps (use executing-plans), or routine dev tasks with ≤5 steps. Trigger words: research plan, multi-session task, task_plan, findings, progress.
 user-invocable: true
 allowed-tools:
   - Read

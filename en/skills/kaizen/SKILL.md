@@ -1,6 +1,6 @@
 ---
 name: kaizen
-description: Continuous improvement methodology. Use for implementation and refactoring, architecture or system design, workflow improvements, error handling, and verification. Includes techniques to avoid over-engineering and apply iterative improvement. Trigger words: kaizen, continuous improvement, YAGNI, poka-yoke, mistake-proofing.
+description: Continuous-improvement and mistake-proofing methodology (YAGNI / Poka-Yoke / iterative improvement). Use ONLY when: (1) refactoring existing code to remove over-engineering or tech debt; (2) improving existing workflows or pipelines; (3) applying mistake-proofing patterns to prevent known classes of errors. NOT for: greenfield feature development (code directly), architecture-level redesign (use software-architecture), or one-shot bug fixes (use systematic-debugging). Trigger words: continuous improvement, Kaizen, YAGNI, Poka-Yoke, mistake-proofing, eliminate waste, iterative optimization.
 ---
 
 # Kaizen: Continuous Improvement

@@ -1,6 +1,6 @@
 ---
 name: kaizen
-description: 持续改进方法论。用于代码实现和重构、架构或系统设计、流程和工作流改进、错误处理和验证。提供避免过度工程和应用迭代改进的技术。触发词：持续改进、Kaizen、YAGNI、Poka-Yoke、防错设计。
+description: 持续改进与防错设计方法论（YAGNI/Poka-Yoke/迭代改进）。仅在以下场景使用：(1) 重构现有代码以消除过度工程或技术债；(2) 改进已有工作流程或流水线；(3) 需要防错设计模式来预防已知类型的错误。不适用于：新功能从零开发（直接编码）、架构级重新设计（用 software-architecture）、或一次性 bug 修复（用 systematic-debugging）。触发词：持续改进、Kaizen、YAGNI、Poka-Yoke、防错设计、消除浪费、迭代优化。
 ---
 
 # Kaizen：持续改进

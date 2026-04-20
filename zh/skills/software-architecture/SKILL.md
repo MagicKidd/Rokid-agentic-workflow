@@ -1,6 +1,6 @@
 ---
 name: software-architecture
-description: 软件架构设计指南。当用户想要编写代码、设计架构、分析代码时使用，适用于任何与软件开发相关的场景。基于 Clean Architecture 和 DDD 原则。触发词：架构设计、代码规范、重构、Clean Architecture、DDD。
+description: 基于 Clean Architecture 和 DDD 的架构决策指南。仅在以下场景使用：(1) 跨模块架构决策（如新增模块的分层归属、依赖方向）；(2) 领域边界划分或聚合根设计；(3) 评估架构方案的合理性（如是否引入新抽象层）。不适用于：单文件内的日常编码（遵循 learned-conventions）、代码重构优化（用 kaizen）、或 Prompt/专家设计（用 prompt-context-design）。触发词：架构设计、分层设计、DDD边界、Clean Architecture、模块划分、依赖倒置。
 ---
 
 # 软件架构开发技能

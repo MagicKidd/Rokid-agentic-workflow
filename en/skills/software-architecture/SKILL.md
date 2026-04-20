@@ -1,6 +1,6 @@
 ---
 name: software-architecture
-description: Software architecture guidance. Use when designing architecture, writing code, or analyzing code. Applies to any software engineering context. Based on Clean Architecture and DDD principles. Trigger words: architecture design, coding standards, refactor, Clean Architecture, DDD.
+description: Architecture-decision guidance based on Clean Architecture and DDD. Use ONLY for: (1) cross-module architecture decisions (layer placement of new modules, direction of dependencies); (2) domain-boundary partitioning or aggregate-root design; (3) evaluating soundness of an architecture proposal (e.g. whether to introduce a new abstraction layer). NOT for: everyday single-file coding (follow learned-conventions), code refactoring/cleanup (use kaizen), or Prompt / expert design (use prompt-context-design). Trigger words: architecture design, layering, DDD boundary, Clean Architecture, module partitioning, dependency inversion.
 ---
 
 # Software Architecture Skill
