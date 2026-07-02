@@ -170,7 +170,7 @@ Does the change touch online + offline + scripts + docs at the same time?
 2. Shipping online logic and training scripts together, producing review noise.
 3. Rewriting utilities the project already has (YAML loader, response wrapper, etc.).
 4. Defaulting experimental flags to on (`FORCE_* = True`).
-5. Writing `try: import pymilvus except: class FakeXxx` in deliverable files — that bakes scaffolding into deliverables.
+5. Writing `try: import private_sdk except: class FakeXxx` in deliverable files — that bakes scaffolding into deliverables.
 6. Two files in the new module each defining the same helper (e.g., `_normalize_vector`) — intra-module duplication.
 7. Two methods differing only in "data source" arg get copy-pasted wholesale instead of extracting a shared core.
 

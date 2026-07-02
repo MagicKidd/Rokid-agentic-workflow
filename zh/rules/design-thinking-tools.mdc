@@ -1,0 +1,34 @@
+---
+description: 非编码设计、讨论与思维工具，与 Matt 编程工作流分离
+alwaysApply: true
+---
+
+# Design Thinking Tools
+
+本规则保留非编码设计和探索 skills。它不能覆盖 `matt-skills-core.mdc` 在编程、调试、测试、提交、PR 或实现任务上的路由。
+
+## 适用范围
+
+用于想法成形、设计讨论、战略探索、问题框定和 skill/process 文档。
+
+如果任务要求修改代码、调试、写测试、创建 PRD/issues 或提交代码，回到 `matt-skills-core.mdc`。
+
+`不要编码`、`暂不实现`、`先不实现`、`只讨论方案` 等否定实现意图优先命中本规则。
+
+## 非编码路由
+
+- 粗糙想法、产品概念、需求探索 -> `superpowers/collaboration/brainstorming`
+- 两种有效方案存在张力 -> `superpowers/architecture/preserving-productive-tensions`
+- 假设卡死 -> `superpowers/problem-solving/inversion-exercise`
+- 需要把无关概念碰撞出新视角 -> `superpowers/problem-solving/collision-zone-thinking`
+- 跨领域模式识别 -> `superpowers/problem-solving/meta-pattern-recognition`
+- 极端规模推演 -> `superpowers/problem-solving/scale-game`
+- 复杂度失控，需要寻找删除复杂度的洞见 -> `superpowers/problem-solving/simplification-cascades`
+- 不知道该用哪种思维工具 -> `superpowers/problem-solving/when-stuck`
+- 追溯知识/方案演化 -> `superpowers/research/tracing-knowledge-lineages`
+- 需要回忆历史对话 -> `superpowers/collaboration/remembering-conversations`
+- 创建、测试、维护或分享 skills -> `superpowers/meta/*`
+
+## 分离约定
+
+不要把旧 Superpowers 编程生命周期恢复为默认流程。普通编程任务以 Matt coding skills 为核心。

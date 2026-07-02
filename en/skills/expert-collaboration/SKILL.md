@@ -86,14 +86,14 @@ Task: Design user authentication module
 
 ### System Architect
 **Reasoning**: Auth module needs to consider security, scalability, and integration.
-**Acting**: 
+**Acting**:
 - Select JWT + Refresh Token strategy
 - Define API spec: /auth/login, /auth/refresh, /auth/logout
 **Observing**: Architecture complete, needs development of implementation details.
 
 ### Full-stack Developer
 **Reasoning**: Based on the architect's plan, I need to implement the code.
-**Acting**: 
+**Acting**:
 - Implement JWT issuing and validation middleware
 - Design Token storage strategy (Redis)
 **Observing**: Core functionality complete, needs test coverage.

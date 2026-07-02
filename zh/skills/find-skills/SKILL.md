@@ -256,7 +256,6 @@ cd ~/.cursor/skills && git add -A && \
 ├── kaizen/                    # 持续改进
 ├── llm-test-standard/         # LLM 测试标准
 ├── my-repositories/           # 个人仓库管理
-├── openclaw-expert/           # OpenClaw 专家
 ├── planning-with-files/       # 文件规划
 ├── project-documentation/     # 项目文档
 ├── prompt-engineering/        # 提示工程

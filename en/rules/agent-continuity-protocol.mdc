@@ -1,0 +1,71 @@
+---
+description: Agent continuity protocol - lightweight new-session state check, task ledger, and stale-file prevention for Codex/Cursor/Claude collaboration
+alwaysApply: true
+---
+
+# Agent Continuity Protocol
+
+Use this rule to keep long-running and multi-agent work grounded in durable project state.
+
+## New Session Check
+
+At the start of each new conversation on a project:
+
+1. Read project-local agent instructions when present: `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/*.mdc`.
+2. Check latest repository state with `git status --short`.
+3. Look for recent task ledgers under `Docs/AgentWork/`.
+4. If continuing an existing task, read the relevant ledger before acting.
+5. Before first editing a target file in this session, reread that file from disk.
+
+## Task Ledger
+
+Create or update `Docs/AgentWork/<task-slug>-<YYYY-MM-DD>.md` when the work is:
+
+- long-running
+- design-heavy
+- cross-file or cross-module
+- likely to involve multiple agents
+- explicitly requested as recorded process/progress/handoff
+
+Ledger entries should record only durable facts:
+
+- goal
+- current state and next step
+- confirmed facts
+- decisions
+- files touched
+- changes made
+- verification
+- open items
+- handoff notes
+
+## Freshness Rule
+
+Default mode is lightweight:
+
+- Do not run strict freshness checks before every action.
+- At each new conversation, refresh project state once.
+- Before first editing a target file in the session, reread it.
+
+Escalate to strict checking only when:
+
+- another agent or user changed the same target file
+- the task touches high-risk production code
+- git status shows unexpected changes in files you plan to edit
+- the user explicitly asks for strict freshness checks
+
+When strict mode is active, do not write based on stale memory. Reconcile the latest file content first.
+
+## Installation Notes
+
+Codex skill path:
+
+```text
+~/.codex/skills/agent-continuity
+```
+
+Cursor rule path:
+
+```text
+~/.cursor/rules/agent-continuity-protocol.mdc
+```

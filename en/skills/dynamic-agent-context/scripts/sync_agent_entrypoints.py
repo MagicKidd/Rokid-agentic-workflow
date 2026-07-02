@@ -4,6 +4,9 @@ Sync cross-editor AI entrypoint files.
 Outputs:
   - AGENTS.md
   - CLAUDE.md
+
+Both files are generated from the same template to keep behavior consistent
+across Cursor/Claude/OpenCode/Codex style workflows.
 """
 
 from __future__ import annotations
@@ -17,7 +20,7 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _render(root: Path) -> str:
+def _render_agents(root: Path) -> str:
     now = datetime.now(timezone.utc).isoformat()
     return f"""# Agent Instructions
 
@@ -31,34 +34,41 @@ Use these project-local profiles first:
 - `.agent-context/project-context.md`
 - `.agent-context/metadata.json`
 
-## Optional Cursor Bridge
+## Hard Rules (Portable Baseline)
 
-If present:
-- `.cursor/rules/learned-conventions.mdc`
-
-## Baseline Rules
-
-1. Prefer the smallest effective change.
-2. Learn local conventions before editing (or use learned conventions when available).
+1. Prefer the smallest change that solves the request.
+2. Read nearby code (2-3 files) before editing to learn local style.
 3. Reuse existing helpers before creating new abstractions.
-4. Self-review diff and remove unrelated edits.
-5. Keep code maintainable for humans.
-6. Never hardcode secrets.
+4. Self-review diff and remove unrelated edits before completion.
+5. Keep code readable for humans; comments explain why, not obvious what.
+6. Never hardcode secrets/tokens/credentials.
 
-## Refresh
+## Project Rule Sources
+
+- Cursor-native rules: `.cursor/rules/*.mdc`
+- Global behavior baseline may exist in user-level Cursor rules
+
+## Refresh Commands
 
 ```bash
 python scripts/refresh_agent_context.py --full
 python scripts/refresh_agent_context.py --changed-only
 ```
+
+## Notes
+
+- This file is editor-neutral and intended to work across tools.
+- For Cursor, `.cursor/rules/*.mdc` still provides richer scoped behavior.
 """
 
 
 def sync(root: Path) -> int:
-    content = _render(root)
-    (root / "AGENTS.md").write_text(content, encoding="utf-8")
-    (root / "CLAUDE.md").write_text(content, encoding="utf-8")
-    print("[OK] synced: AGENTS.md and CLAUDE.md")
+    content = _render_agents(root)
+    agents = root / "AGENTS.md"
+    claude = root / "CLAUDE.md"
+    agents.write_text(content, encoding="utf-8")
+    claude.write_text(content, encoding="utf-8")
+    print(f"[OK] synced: {agents} and {claude}")
     return 0
 
 
@@ -71,4 +81,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

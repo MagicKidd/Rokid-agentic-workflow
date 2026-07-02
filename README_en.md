@@ -9,111 +9,53 @@
   <b>English</b> | <a href="./README.md">简体中文</a>
 </p>
 
-> Exploring practical collaboration patterns to help AI coding assistants maintain context and execution discipline in daily development.
+> A sanitized Agentic Coding workflow: thin routing rules plus reusable skills for AI-assisted coding, debugging, testing, commits, and design discussion.
 
-In everyday engineering practices, the team (Jing, et al.) noticed that when using AI coding assistants (like Cursor, Claude Code) for complex tasks, the AI often loses context over long conversations or rushes into coding without sufficient design. This leads to over-engineering or subtle bugs.
-
-**Agentic Coding Workflow** is an AI collaboration protocol designed for developers. By utilizing predefined routing rules (Rules) and professional skill packs (Skills), it breaks down tasks into structured steps—from context gathering and architectural design, to coding and automated verification—making the AI collaboration process more predictable, transparent, and disciplined.
-
-## 📖 Table of Contents
-- [Core Concepts](#-core-concepts)
-- [Quick Start](#-quick-start)
-- [Directory Structure](#-directory-structure)
-- [Basic Usage](#-basic-usage)
-- [License & Acknowledgements](#-license--acknowledgements)
-
----
-
-## 💡 Core Concepts
-
-- **Mitigating Context Loss**: Through automated information retrieval (Phase 1), the AI scans related code, architectural documents, and past troubleshooting records right at the beginning of the conversation to establish a solid baseline.
-- **Auto-Learning Project Conventions**: Bundled dynamic context scripts allow AI to distill naming, typing, logging, and error-handling patterns directly from your codebase, turning them into actionable rules to prevent generating inconsistent "slop" code.
-- **Enforcing Engineering Discipline**: "Decision points" (Phase 2 & 3) are introduced before any code is written. Only after the approach is confirmed by the human will the AI be authorized to load professional skills like TDD or multi-step planning (Phase 4) for standardized development.
-- **Verification First**: The AI is strictly required to provide evidence of passing tests or successful execution before claiming a defect is fixed or a task is completed.
-
-👉 **[Click here for detailed workflow concepts & architecture (WORKFLOW_en.md)](./WORKFLOW_en.md)**
-
----
-
-## ⚡ Quick Start
-
-Regardless of which AI coding tool you use, this pure Markdown-based methodology is relatively straightforward to integrate into your workspace.
-
-### 1. Get the Toolkit
-
-Clone this repository to your local machine. To include the `superpowers` submodule (which provides core foundational dependencies), use the `--recursive` flag:
+## Quick Start
 
 ```bash
-# Recommended to place in a global, reusable directory
-mkdir -p ~/.cursor/skills
-cd ~/.cursor/skills
-git clone --recursive https://github.com/MagicKidd/Rokid-agentcode.git .
+git clone --recursive https://github.com/MagicKidd/Rokid-agentic-workflow.git ~/.cursor/skills/agentic-coding-workflow
 ```
 
-### 2. IDE Integration
+### Cursor
 
-Depending on the AI IDE you use daily, choose the corresponding setup method:
-
-#### 🔹 For Cursor Users
-Cursor natively supports reading `.mdc` rules from the `.cursor/rules` directory in your project.
-
-1. Run the following in your project root:
 ```bash
 mkdir -p .cursor/rules
-# Use symlinks to easily keep your workflow updated across projects
-ln -s ~/.cursor/skills/en/rules/ai-coding-protocol.mdc .cursor/rules/
-ln -s ~/.cursor/skills/en/rules/new-task-trigger.mdc .cursor/rules/
-ln -s ~/.cursor/skills/en/rules/new-task-kickoff.mdc .cursor/rules/
+ln -s ~/.cursor/skills/agentic-coding-workflow/en/rules/matt-skills-core.mdc .cursor/rules/
+ln -s ~/.cursor/skills/agentic-coding-workflow/en/rules/ai-coding-protocol.mdc .cursor/rules/
+ln -s ~/.cursor/skills/agentic-coding-workflow/en/rules/design-thinking-tools.mdc .cursor/rules/
+ln -s ~/.cursor/skills/agentic-coding-workflow/en/rules/agent-continuity-protocol.mdc .cursor/rules/
 ```
-2. Open Cursor's Composer and simply type: "Start working on a new feature...". The trigger will automatically intercept the prompt and guide the step-by-step process.
-*(See [adapters/cursor/README.md](adapters/cursor/README.md) for more details)*
 
-#### 🔹 For Claude Code Users
-Claude Code relies on a `CLAUDE.md` file in the project root to load system-level context.
+### Claude Code / OpenCode
 
-1. Copy `adapters/claude-code/CLAUDE.md` to your project root.
-2. Edit `CLAUDE.md` and replace `<path-to-agentic-coding-workflow>` with the absolute path where you cloned this repository.
-3. Run `claude` and issue a task. Claude will automatically read the specified Skills and follow the protocol.
+Copy `adapters/claude-code/CLAUDE.md` or `adapters/opencode/AGENTS.md` into your project root and replace `<path-to-agentic-coding-workflow>` with your local checkout path.
 
-#### 🔹 For OpenCode and Others
-Similarly, copy `adapters/opencode/AGENTS.md` to your project root and update the absolute paths.
+## Current Workflow
 
----
+This repository now uses a Matt-style, small composable workflow:
 
-## 📦 Directory Structure
+- `matt-skills-core.mdc` only routes intent.
+- Coding tasks load focused skills such as `diagnose`, `tdd`, `to-prd`, `to-issues`, `triage`, and `improve-codebase-architecture`.
+- Non-coding design discussion is routed by `design-thinking-tools.mdc` to Superpowers thinking tools.
+- `ai-coding-protocol.mdc` only keeps guardrails such as smallest effective change, read before write, and verify before completion.
+
+## Structure
 
 ```text
 agentic-coding-workflow/
 ├── zh/                     # Chinese rules and skills
-│   ├── rules/
-│   └── skills/
 ├── en/                     # English rules and skills
-│   ├── rules/              # Routing rules
-│   └── skills/             # Core skills library
-├── superpowers/            # [Recommended dependency] obra/superpowers excellent community practices
-├── templates/              # Reusable templates (e.g., project-specific rules, lessons learned)
-├── adapters/               # IDE integration guides (Cursor / Claude Code / OpenCode)
-├── README_en.md            # This document
-└── WORKFLOW_en.md          # Detailed workflow design
+├── superpowers/            # Community Superpowers submodule
+├── adapters/               # Cursor / Claude Code / OpenCode adapters
+├── templates/              # Reusable templates
+└── docs/                   # Sync reports and showcase assets
 ```
 
----
+## Sanitization Boundary
 
-## 🛠️ Basic Usage
+Only general engineering workflow content is included: coding workflow, tests, debugging, architecture, commits, docs, research, frontend, and prompt design. Personal profiles, private links, product-specific names, private repository lists, company-specific rules, and domain-specific skills are excluded.
 
-Once configured, when you need the AI to assist with development, you don't need to provide lengthy background information. You can start with a simple prompt:
+## License and Credits
 
-> **"Start refactoring the user authentication module"** or **"Initiate new task: add export functionality"**
-
-Constrained by the protocol, the AI will break the work into several phases:
-1. **Auto Context Gathering (Phase 1)**: Retrieves related code, architecture docs, and past troubleshooting records in the background.
-2. **Report & Decision (Phase 2 & 3)**: Summarizes the context it found and asks for your decision (e.g., whether to dive into design discussions regarding edge cases, or to start coding immediately).
-3. **Step-by-Step Execution (Phase 4)**: Once you confirm the approach, the AI loads the appropriate development skills (such as TDD, multi-step planning) to begin coding systematically.
-
----
-
-## 📜 License & Acknowledgements
-
-This project is open-source. Contributions are welcome.
-
-In building this workflow, we referenced and learned from excellent practices in the open-source community. Special thanks to [@obra](https://github.com/obra/superpowers-skills) for the `superpowers` collection, which contains highly valuable foundational engineering disciplines. The `superpowers` directory in this repository is included as a Git Submodule, and its copyright belongs to the original author.
+This project shares reusable AI coding workflow practices. The `superpowers` directory is imported as a Git submodule and remains under its original authors' copyright.

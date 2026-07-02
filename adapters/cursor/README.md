@@ -1,29 +1,27 @@
-# Cursor IDE 适配指南
+# Cursor IDE Adapter
 
-Cursor 原生支持读取 `.cursor/rules/*.mdc`。
+Cursor reads `.cursor/rules/*.mdc` natively. Link the workflow rules into each project that should use this workflow.
 
-## 配置方法
-
-1. 在你的项目根目录创建 `.cursor/rules` 文件夹（如果没有的话）。
-2. 将 `agentic-coding-workflow/rules/` 目录下的所有 `.mdc` 文件**复制或软链接**到你的项目中：
+## Chinese Rules
 
 ```bash
 mkdir -p .cursor/rules
-cp path/to/agentic-coding-workflow/rules/*.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/zh/rules/matt-skills-core.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/zh/rules/ai-coding-protocol.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/zh/rules/design-thinking-tools.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/zh/rules/agent-continuity-protocol.mdc .cursor/rules/
 ```
 
-或者使用软链接（便于统一更新）：
+## English Rules
 
 ```bash
 mkdir -p .cursor/rules
-ln -s path/to/agentic-coding-workflow/rules/new-task-trigger.mdc .cursor/rules/
-ln -s path/to/agentic-coding-workflow/rules/new-task-kickoff.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/en/rules/matt-skills-core.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/en/rules/ai-coding-protocol.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/en/rules/design-thinking-tools.mdc .cursor/rules/
+ln -s <path-to-agentic-coding-workflow>/en/rules/agent-continuity-protocol.mdc .cursor/rules/
 ```
 
-## 开始使用
+## Skills
 
-打开 Cursor 的 Composer (Cmd/Ctrl + I) 并发送信号：
-> "开始做一个新功能..." 
-> "启动重构任务..."
-
-Cursor 会自动触发 `new-task-trigger.mdc` 并拉起完整工作流。
+Point your agent or local conventions at `<path-to-agentic-coding-workflow>/zh/skills` or `<path-to-agentic-coding-workflow>/en/skills`. The rules route to skills by name, for example `diagnose`, `tdd`, `to-prd`, and `safe-commit`.

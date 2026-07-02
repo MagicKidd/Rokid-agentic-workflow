@@ -1,0 +1,52 @@
+---
+description: Matt Pocock skills 作为默认编程工作流路由器
+alwaysApply: true
+---
+
+# Matt Skills Core Router
+
+把 Matt Pocock skills 作为默认编程工作流。这个规则只负责路由：判断当前任务应该加载哪个 skill，然后严格遵循该 skill 自身的流程。
+
+## 优先级
+
+1. 用户明确指令与项目本地 `AGENTS.md` / `CLAUDE.md`。
+2. 本规则。
+3. 本地领域插件，仅在明确命中窄域场景时使用。
+
+不要继续使用旧的 `core-think` 或 Phase 0-4 生命周期作为编程任务默认流程。
+
+## 完整性约定
+
+- 活跃的 Matt skills 默认保持上游原文，不擅自改写流程。
+- 本规则只做路由和意图消歧，不重写 Matt skill 的工作方式。
+- 一旦选中某个 skill，按该 skill 的顺序、反馈循环、术语和停止条件执行。
+- 本地原则只能补充安全约束，不能增加重型阶段、跳过反馈循环或替换 Matt 的小型可组合工作法。
+
+## 核心路由
+
+- 配置 pre-commit、Husky、lint-staged -> `setup-pre-commit`
+- 用户要求 commit -> `safe-commit`
+- bug、失败测试、异常、性能退化 -> `diagnose`
+- 需要锁定行为的新功能或修复 -> `tdd`
+- 方案模糊、术语冲突、需要拷问设计 -> `grill-with-docs`
+- 从当前上下文生成 PRD -> `to-prd`
+- 把计划拆成垂直切片 issues -> `to-issues`
+- 架构摩擦、浅模块、难测试 -> `improve-codebase-architecture`
+- 不熟悉代码区域，需要模块地图 -> `zoom-out`
+- issue 流程、triage、ready-for-agent brief -> `triage`
+- 首次安装或刷新 Matt workflow -> `setup-matt-pocock-skills`
+
+## 意图区分
+
+- `pre-commit` 指 hook 配置，不是 git commit。
+- `commit`、`提交` 等提交动词优先于 bug/fix 路由。
+- `不要编码`、`暂不实现`、`只讨论方案` 等否定实现意图，交给 `design-thinking-tools.mdc`。
+- `开始实现`、`进入编码`、`补测试`、`落地` 等实现意图，回到本规则路由。
+
+## 操作规则
+
+- 命中路由后先读取相关 skill。
+- 优先使用一个聚焦 skill，不堆叠多个流程系统。
+- 实现任务优先做 tracer-bullet 垂直切片。
+- 测试验证外部可观察行为，不验证内部调用细节。
+- 使用项目 `CONTEXT.md` 词汇，尊重 `docs/adr/` 里的既有决策。

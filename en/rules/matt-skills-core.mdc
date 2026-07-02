@@ -1,0 +1,68 @@
+---
+description: Matt Pocock skills as the primary coding workflow router
+alwaysApply: true
+---
+
+# Matt Skills Core Router
+
+Use Matt Pocock's skills as the primary programming workflow. Keep this rule thin:
+route to the right skill, then let that skill carry the process.
+
+## Priority
+
+1. User instructions and project-local `AGENTS.md` / `CLAUDE.md`
+2. This Matt skills router
+3. Local domain plugins, only when their specific trigger matches
+
+Do not use the old `core-think` / Phase 0-4 lifecycle for programming work.
+
+## Matt Integrity Contract
+
+- Active Matt skills must stay byte-identical to upstream unless the user explicitly asks to fork them.
+- This rule only routes and disambiguates intent; it must not rewrite a Matt skill's workflow.
+- Once a Matt skill is selected, follow that skill's own sequence, feedback loop, vocabulary, and stopping conditions.
+- Local principles may add safety constraints, but must not add heavyweight phases, skip Matt feedback loops, or replace Matt's small composable philosophy.
+- If a local plugin conflicts with a Matt programming skill, the Matt programming skill wins for workflow.
+
+## Core Routes
+
+- Pre-commit hook setup (`pre-commit`, Husky, lint-staged) -> `setup-pre-commit`
+- Commit requested -> local `safe-commit`
+- Bug, failing test, exception, broken behavior, performance regression -> `diagnose`
+- Feature or bugfix where behavior should be locked down -> `tdd`
+- Plan/design is fuzzy, terminology conflicts, or user wants stress testing -> `grill-with-docs`
+- Need PRD from current context -> `to-prd`
+- Need implementation issues or vertical slices -> `to-issues`
+- Architecture friction, shallow modules, hard-to-test code -> `improve-codebase-architecture`
+- Unfamiliar code area, need module map or caller context -> `zoom-out`
+- Issue workflow / triage / ready-for-agent briefs -> `triage`
+- First-time project setup for Matt skills -> `setup-matt-pocock-skills`
+
+## Intent Disambiguation
+
+- `pre-commit` means hook setup, not a git commit request.
+- Commit verbs (`commit`, `提交`, `保存这次修改`) win over bug/fix verbs.
+- Design requests with negative implementation intent (`不要编码`, `暂不编码`, `先不实现`, `只讨论方案`) are non-coding exploration and should use `design-thinking-tools.mdc`.
+- Implementation verbs with affirmative intent (`开始实现`, `进入编码`, `补测试`, `落地`) route here.
+
+## Operating Rules
+
+- Read the relevant skill before acting when a route matches.
+- Prefer one focused skill over stacking multiple workflow systems.
+- For implementation, favor tracer-bullet vertical slices over horizontal layer work.
+- Tests verify observable behavior through public interfaces, not internal calls.
+- Use project `CONTEXT.md` vocabulary and respect `docs/adr/` decisions when present.
+- If project domain docs are missing, create or update them lazily through `grill-with-docs` or `setup-matt-pocock-skills`.
+
+## Local Plugins Kept
+
+Use these only for their narrow domains:
+
+- `safe-commit`
+- `community-solution-research`
+- `design-impl-audit`
+- `dynamic-agent-context`
+- `mergeable-feature-dev`
+- `prompt-engineering`
+- `frontend-design`
+- other project-approved domain plugins

@@ -1,100 +1,44 @@
-# Agentic Workflow: 结构化的 AI 协作流程
+# Agentic Workflow：最新共享版
 
-## 一、为什么需要工作流协议？
+## 为什么更新
 
-在使用各种强大的 AI 辅助编程工具（如 Cursor, Claude Code）时，经常会遇到以下痛点：
-1. **上下文遗忘**：由于单次对话过长，AI 很容易偏离最初的目标，或在庞大的代码库中产生不相关的修改建议。
-2. **缺乏流程纪律**：如果给出较为宽泛的任务指令，AI 可能会在没有理清需求边界和现有架构的情况下，直接给出大段的实现代码，导致过度工程或引入难以察觉的 Bug。
+旧版仓库以 Phase 0-4 生命周期为主，容易把简单任务也推入重型流程。最新私有 skills 库已经收敛为更薄的路由方式：规则只负责判断任务类型，真正的执行纪律交给对应 skill。
 
-我们希望通过这套约定，对 AI 的行为进行规范化的引导，核心思路是：
-
-> **人类主导设计，提供输入并做出决策；AI 收集信息，提供选项，并在确认后严谨执行。**
-
-通过引入阶段划分（Phases）和明确的检查点（Checkpoints），我们将发散的对话转化为更为可预期的流程。
-
----
-
-## 二、工作流全景图
-
-当向 IDE 下达例如 _"开始实现购物车逻辑"_ 的指令时，触发规则会引导对话进入如下的阶段：
+## 核心模型
 
 ```mermaid
-graph TD
-    User([用户发起新任务]) --> P1
-    
-    subgraph Phase 1: 上下文采集
-        P1[自动信息检索] --> P1A[历史教训与文档]
-        P1 --> P1B[代码依赖与近期变更]
-    end
-    
-    P1A & P1B --> P2
-    
-    subgraph Phase 2 & 3: 摘要与人类决策
-        P2[呈现结构化摘要] --> P3{等待用户选择方向}
-        P3 -->|A. 需讨论需求| C1[进行深度探讨]
-        P3 -->|B. 方案清晰| C2[制定实施计划]
-        P3 -->|C. 简单明确| C3[直接编码]
-        P3 -->|D. 排查问题| C4[规范化排查]
-    end
-    
-    subgraph Phase 4: AI 推进执行 (按需加载技能)
-        C1 --> |应用头脑风暴指南| Doc[敲定设计]
-        Doc --> C2
-        
-        C2 --> |应用任务拆解指南| Plan[输出步骤清单]
-        Plan --> |支持子代理并行| Exec[按步骤执行]
-        
-        Exec --> |要求代码审查| Review[阶段复查]
-        Review --> |倡导 TDD 测试先行| Valid[测试与验证]
-        
-        C3 --> Valid
-        
-        C4 --> |应用系统化调试指南| Fix[定位与修复]
-        Fix --> Valid
-        
-        Valid --> Done([任务闭环])
-    end
-    
-    classDef phase fill:#f9f9f9,stroke:#333,stroke-width:2px;
-    class P1,P2,P3,Phase4 phase;
+flowchart TD
+    User[用户请求] --> Router[matt-skills-core]
+    Router --> Bug[diagnose]
+    Router --> Build[tdd]
+    Router --> Plan[to-prd 或 to-issues]
+    Router --> Arch[improve-codebase-architecture]
+    Router --> Commit[safe-commit]
+    Router --> Design[design-thinking-tools]
+    Design --> Superpowers[superpowers thinking skills]
 ```
 
-### Phase 1: 上下文采集
-AI 先不急于给出代码，而是通过文件搜索或执行脚本，扫描项目里的文档、关联的代码模块，甚至是以前犯错积累下来的 `lessons.md` 避坑指南。
+## 编程任务路由
 
-### Phase 2 & 3: 摘要与人类决策
-AI 将收集到的关键信息进行汇总，列出它理解的当前状态与约束条件，然后询问人类开发者希望如何推进（是需要一起讨论设计，还是可以直接按照现有计划开干）。
+- Bug、异常、失败测试、性能退化：`diagnose`。先建立可重复反馈环，再假设、插桩、修复和回归测试。
+- 新功能或修复需要锁定行为：`tdd`。用 tracer-bullet 垂直切片，一次一个测试，一次一个实现。
+- 需要 PRD：`to-prd`。从当前上下文合成 PRD，不重新访谈用户。
+- 需要拆任务：`to-issues`。把计划拆成可独立交付的垂直切片。
+- 架构摩擦或难测试：`improve-codebase-architecture`。寻找浅模块和可深化的 seam。
+- 提交：`safe-commit`。提交前检查范围、排除无关过程文件，说明纳入和排除内容。
 
-### Phase 4: AI 推进执行
-得到人类的确认后，AI 会根据所选路径，自动加载对应的专业知识库（Skills）。例如，如果进入了排错模式，它会加载 `systematic-debugging` 技能，强制自己先查明根因再提供修改建议；如果是写新模块，它会遵循 TDD 指南，先建立测试文件。
+## 非编码任务路由
 
----
+`design-thinking-tools.mdc` 接管暂不编码、只讨论方案、需求探索、思维工具、skill/process 文档等任务，并路由到 Superpowers 的 brainstorming、inversion、scale-game、meta-pattern 等工具。
 
-## 三、部分核心 Skills 简介
+## 护栏
 
-Skills 是指导 AI 在特定场景下如何行为的文本参考，它们按作用被划分：
+`ai-coding-protocol.mdc` 只保留跨任务通用的安全线：最小有效改动、先读后写、先复用再发明、测试行为不测内部、有验证再收尾、不提交秘密。
 
-### 1. 思维辅助与讨论
-在需求不明确时，引导 AI 以提问或辩论的方式帮助收敛思路。
-- **`brainstorming`**：要求 AI 一次只问一个问题，给出多个可能的选择供用户挑选，而不是长篇大论。
-- **`expert-debate`** / **`expert-collaboration`**：让 AI 模拟不同视角的专家，通过讨论暴露方案中的风险点。
+## 连续性
 
-### 2. 研发纪律约束
-在执行阶段，规范 AI 产出代码的过程。
-- **`kaizen`**：强调简单的迭代和持续改进，避免为了尚未发生的需求过度设计（YAGNI）。
-- **`software-architecture`**：倡导清晰的关注点分离，优先使用现有成熟的库而不是手写基础设施代码。
-- **`test-driven-development`**：提醒 AI 先写测试用例验证预期，再去修改业务代码。
-- **`planning-with-files`**：当步骤较多时，引导 AI 维护外部的进展记录文件，避免记忆丢失。
+`agent-continuity-protocol.mdc` 要求新会话先确认仓库状态，长任务维护任务账本，首次编辑文件前重新读取磁盘内容，避免覆盖用户或其他 agent 的改动。
 
-### 3. 基石实践依赖 (Superpowers)
-引入的社区优秀实践合集（`obra/superpowers`），它提供了底层的流程保障，例如：
-- **`verification-before-completion`**：规定 AI 在结束任务前必须主动执行脚本检查运行结果。
-- **`subagent-driven-development`**：利用子代理拆分独立任务，隔离对话上下文。
+## 同步边界
 
----
-
-## 四、如何定制工作流
-
-1. **项目级规则约定**：你可以在业务项目的 `.cursor/rules/` 目录下放置特定的技术规范文件。当 Phase 1 扫描时，AI 会自动感知并把这些定制约束考虑进去。
-2. **沉淀历史教训**：在合作中如果发现 AI 反复犯某一类错误，可以直接指出并让它写入项目内的 `lessons.md`。这将被作为前置经验在后续任务中被自动参考。
-3. **编写新的 Skill**：如果你有专门的内网工具使用手册，或是公司统一的 UI 库开发指南，可以通过纯文本的方式添加到 `skills/` 中，并在你的日常 Prompt 中指示 AI 读取它们。
+本共享版已脱敏：不包含个人画像、私有路径、内网仓库、业务项目名和公司专项规则。

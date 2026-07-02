@@ -1,0 +1,43 @@
+---
+description: Non-coding design, discussion, and thinking tools separated from Matt coding workflow
+alwaysApply: true
+---
+
+# Design Thinking Tools
+
+This rule preserves the old non-coding design and exploration skills. It must not
+override `matt-skills-core.mdc` for programming, debugging, tests, commits, PRs,
+or implementation work.
+
+## Scope
+
+Use these skills for idea shaping, design discussion, strategic exploration,
+problem framing, and skill/process documentation.
+
+If the task asks to modify code, debug code, write tests, create PRDs/issues, or
+commit work, route through `matt-skills-core.mdc` instead.
+
+Negative implementation intent wins here: `不要编码`, `暂不编码`, `先不实现`,
+`只讨论方案`, and similar phrases mean the user wants exploration only.
+
+## Restored Non-Coding Routes
+
+- Rough idea, product concept, design discussion, requirements exploration -> `superpowers/collaboration/brainstorming`
+- Two valid approaches are in tension and should not be collapsed too early -> `superpowers/architecture/preserving-productive-tensions`
+- Stuck because assumptions feel fixed -> `superpowers/problem-solving/inversion-exercise`
+- Need to force unrelated concepts together for new insight -> `superpowers/problem-solving/collision-zone-thinking`
+- Pattern appears across multiple domains -> `superpowers/problem-solving/meta-pattern-recognition`
+- Need to test an idea at extreme scale -> `superpowers/problem-solving/scale-game`
+- Complexity is spiraling and one simplifying insight may delete many pieces -> `superpowers/problem-solving/simplification-cascades`
+- Stuck and unsure which thinking technique fits -> `superpowers/problem-solving/when-stuck`
+- Need to understand why an idea or approach evolved over time -> `superpowers/research/tracing-knowledge-lineages`
+- Need to remember relevant past conversations during non-coding exploration -> `superpowers/collaboration/remembering-conversations`
+- Creating, testing, maintaining, or sharing skills themselves -> `superpowers/meta/*`
+
+## Separation Contract
+
+- Do not restore old Superpowers coding workflow skills as defaults.
+- Do not call old `writing-plans`, `executing-plans`, `systematic-debugging`,
+  `test-driven-development`, `requesting-code-review`, or `finishing-a-development-branch`
+  for normal programming work.
+- Matt coding skills remain the core programming system.

@@ -20,7 +20,7 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _render(root: Path) -> str:
+def _render_agents(root: Path) -> str:
     now = datetime.now(timezone.utc).isoformat()
     return f"""# Agent Instructions
 
@@ -34,19 +34,19 @@ Use these project-local profiles first:
 - `.agent-context/project-context.md`
 - `.agent-context/metadata.json`
 
-## Cursor Rule Bridge (Optional)
-
-If present, Cursor may also load:
-- `.cursor/rules/learned-conventions.mdc`
-
 ## Hard Rules (Portable Baseline)
 
 1. Prefer the smallest change that solves the request.
-2. Learn local conventions before editing (or use learned conventions when available).
+2. Read nearby code (2-3 files) before editing to learn local style.
 3. Reuse existing helpers before creating new abstractions.
 4. Self-review diff and remove unrelated edits before completion.
 5. Keep code readable for humans; comments explain why, not obvious what.
 6. Never hardcode secrets/tokens/credentials.
+
+## Project Rule Sources
+
+- Cursor-native rules: `.cursor/rules/*.mdc`
+- Global behavior baseline may exist in user-level Cursor rules
 
 ## Refresh Commands
 
@@ -54,14 +54,21 @@ If present, Cursor may also load:
 python scripts/refresh_agent_context.py --full
 python scripts/refresh_agent_context.py --changed-only
 ```
+
+## Notes
+
+- This file is editor-neutral and intended to work across tools.
+- For Cursor, `.cursor/rules/*.mdc` still provides richer scoped behavior.
 """
 
 
 def sync(root: Path) -> int:
-    content = _render(root)
-    (root / "AGENTS.md").write_text(content, encoding="utf-8")
-    (root / "CLAUDE.md").write_text(content, encoding="utf-8")
-    print("[OK] synced: AGENTS.md and CLAUDE.md")
+    content = _render_agents(root)
+    agents = root / "AGENTS.md"
+    claude = root / "CLAUDE.md"
+    agents.write_text(content, encoding="utf-8")
+    claude.write_text(content, encoding="utf-8")
+    print(f"[OK] synced: {agents} and {claude}")
     return 0
 
 
@@ -74,4 +81,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

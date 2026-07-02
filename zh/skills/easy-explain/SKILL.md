@@ -1,54 +1,63 @@
 ---
 name: easy-explain
-description: 把技术术语翻译成业务/非研发能懂的日常语言。当用户说"用容易理解的方式解释"、"说人话"、"通俗解释"、"我不是研发听不懂"时使用。触发词：说人话、通俗解释、翻译技术词。
+description: Explain technical terms in plain, non-engineering language. This skill should be used when users ask "用容易理解的方式解释一下", "说人话", "通俗解释", or similar requests.
+license: Complete terms in LICENSE.txt
 ---
 
 # Easy Explain
 
-把技术名词、函数名、架构术语翻译成业务同事能秒懂的语言。
+Use this skill to translate technical names, function names, and architecture terms into business-friendly explanations.
 
-## 适用对象
+Target audience:
+- Non-engineers
+- Product/operations stakeholders
+- Any user asking for plain language
 
-- 非研发同事
-- 产品 / 运营 / 商务干系人
-- 任何要求"说人话"的场景
+## Output Style
 
-## 输出模板（5 段式）
+Always explain each term with this 5-part template:
 
-每个术语固定按以下 5 段解释：
+1. `它是什么`:
+   - One short sentence in plain language
 
-1. **它是什么**：一句日常语言
-2. **它在流程里的作用**：为什么系统里要有它
-3. **它接收什么**：输入，用日常语言描述
-4. **它产出什么**：输出，用日常语言描述
-5. **如果没有它会怎样**：实际影响或风险
+2. `它在流程里的作用`:
+   - Why this exists in the system
 
-然后追加：
-- **一句话总结**：1 句话
-- **生活类比**（可选）：仅在有助于理解时使用
+3. `它接收什么`:
+   - Input in everyday words
 
-## 硬规则
+4. `它产出什么`:
+   - Output in everyday words
 
-- ❌ 不预设对方懂代码
-- ❌ 不使用未解释的 jargon
-- ✅ 中文优先
-- ✅ 每个术语控制在 5-8 行，简洁
-- ⚠️ 若术语有歧义，明说假设
+5. `如果没有它会怎样`:
+   - Practical impact or risk
 
-## 典型触发语
+Then add:
+- `一句话总结`: 1 sentence
+- Optional `生活类比`: only when it makes understanding easier
+
+## Hard Rules
+
+- Do NOT assume coding knowledge
+- Do NOT use unexplained jargon
+- Prefer Chinese
+- Keep each term concise (5-8 lines)
+- If name is ambiguous, state assumptions explicitly
+
+## Examples of Trigger Phrases
 
 - "用容易理解的方式解释一下"
-- "说人话"
+- "说人话解释"
 - "我不是研发，听不懂"
 - "把这个技术词翻译成业务语言"
 
-## 好解释示范
+## Good Explanation Example
 
-术语：`intent_summary`
+Term: `intent_summary`
 
-- **它是什么**：把用户意图的处理结果整理成一页简明结论。
-- **它在流程里的作用**：给后续模块或前端一个"可直接展示"的统一摘要，而不是零散字段。
-- **它接收什么**：识别出的意图、置信度、相关证据等中间结果。
-- **它产出什么**：一段结构化摘要（例如"用户想做什么、系统判断是否通过、下一步建议"）。
-- **如果没有它会怎样**：下游需要自己拼装结果，容易出现口径不一致。
-- **一句话总结**：把分析结果翻译成统一报告的步骤。
+- 它是什么：把用户意图的处理结果整理成一页简明结论。
+- 它在流程里的作用：给后续模块或前端一个“可直接展示”的统一摘要，而不是零散字段。
+- 它接收什么：识别出的意图、置信度、相关证据等中间结果。
+- 它产出什么：一段结构化摘要（例如“用户想做什么、系统判断是否通过、下一步建议”）。
+- 如果没有它会怎样：下游需要自己拼装结果，容易出现口径不一致。
+- 一句话总结：它是“把分析结果翻译成统一报告”的步骤。

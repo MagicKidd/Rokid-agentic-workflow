@@ -86,14 +86,14 @@ description: 启动专家协作模式，多角色分工合作完成复杂任务�
 
 ### System Architect
 **推理**: 认证模块需要考虑安全性、可扩展性、与现有系统集成
-**行动**: 
+**行动**:
 - 选定 JWT + Refresh Token 方案
 - 定义接口规范：/auth/login, /auth/refresh, /auth/logout
 **观察**: 架构层面完成，需要开发实现细节
 
 ### Full-stack Developer
 **推理**: 基于架构师的方案，需要实现具体代码
-**行动**: 
+**行动**:
 - 实现 JWT 签发和验证中间件
 - 设计 Token 存储策略（Redis）
 **观察**: 核心功能完成，需要测试覆盖

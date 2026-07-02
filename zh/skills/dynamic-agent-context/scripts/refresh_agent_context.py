@@ -16,10 +16,7 @@ from pathlib import Path
 
 KEY_PATTERNS = (
     "src/",
-    "app/",
-    "lib/",
     "tests/",
-    "test/",
     "pyproject.toml",
     "requirements.txt",
     ".cursor/rules/",
@@ -53,7 +50,9 @@ def _run_git_changed(root: Path) -> list[str]:
     return unique
 
 
-def _needs_refresh(root: Path, changed_files: list[str]) -> bool:
+def _needs_refresh(root: Path, changed_files: list[str]) -> tuple[bool, list[str]]:
+    reasons: list[str] = []
+
     out_dir = root / ".agent-context"
     required = [
         out_dir / "conventions.md",
@@ -61,33 +60,51 @@ def _needs_refresh(root: Path, changed_files: list[str]) -> bool:
         out_dir / "metadata.json",
         root / "AGENTS.md",
         root / "CLAUDE.md",
-        root / ".cursor" / "rules" / "learned-conventions.mdc",
     ]
-    if any(not p.exists() for p in required):
-        return True
-    return any(p.startswith(KEY_PATTERNS) for p in changed_files)
+    missing = [str(p.relative_to(root)) for p in required if not p.exists()]
+    if missing:
+        reasons.append(f"missing outputs: {', '.join(missing)}")
+
+    matched = [p for p in changed_files if p.startswith(KEY_PATTERNS)]
+    if matched:
+        reasons.append(f"key files changed ({len(matched)}): {', '.join(matched[:8])}")
+        if len(matched) > 8:
+            reasons[-1] += f" ... and {len(matched) - 8} more"
+
+    return bool(reasons), reasons
 
 
 def _run_python(script: Path, root: Path) -> int:
-    return subprocess.call([sys.executable, str(script), "--root", str(root)], cwd=root)
+    cmd = [sys.executable, str(script), "--root", str(root)]
+    return subprocess.call(cmd, cwd=root)
 
 
 def refresh(root: Path, full: bool) -> int:
     changed = _run_git_changed(root)
-    if not full and not _needs_refresh(root, changed):
-        print("[SKIP] no key changes detected and context files exist")
-        return 0
+    if full:
+        print("[MODE] full refresh (forced)")
+    else:
+        needed, reasons = _needs_refresh(root, changed)
+        if not needed:
+            print("[SKIP] no key changes detected and context files exist")
+            return 0
+        print("[TRIGGER] refresh needed because:")
+        for r in reasons:
+            print(f"  - {r}")
 
-    gen = root / "scripts" / "generate_agent_context.py"
-    sync = root / "scripts" / "sync_agent_entrypoints.py"
-    if not gen.exists() or not sync.exists():
-        print("[ERR] required scripts are missing under scripts/")
+    gen_script = root / "scripts" / "generate_agent_context.py"
+    sync_script = root / "scripts" / "sync_agent_entrypoints.py"
+    if not gen_script.exists() or not sync_script.exists():
+        print("[ERR] required scripts are missing")
         return 2
 
-    if _run_python(gen, root) != 0:
-        return 3
-    if _run_python(sync, root) != 0:
-        return 4
+    code1 = _run_python(gen_script, root)
+    if code1 != 0:
+        return code1
+
+    code2 = _run_python(sync_script, root)
+    if code2 != 0:
+        return code2
 
     print("[OK] refresh completed")
     return 0
@@ -97,14 +114,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh .agent-context and entrypoint files")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--full", action="store_true", help="Force full refresh")
-    group.add_argument("--changed-only", action="store_true", help="Refresh only when key files changed")
+    group.add_argument(
+        "--changed-only",
+        action="store_true",
+        help="Refresh only when key files changed",
+    )
     parser.add_argument("--root", type=Path, default=_repo_root(), help="Repository root")
     args = parser.parse_args()
 
+    # Default behavior: changed-only
     full = args.full and not args.changed_only
     return refresh(args.root.resolve(), full=full)
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

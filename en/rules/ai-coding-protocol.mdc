@@ -1,70 +1,55 @@
 ---
-description: Global dynamic AI coding protocol (minimal change, read-before-write, diff self-review)
-globs: *
+description: Matt-compatible global coding guardrails: smallest change, read before write, verify before completion
 alwaysApply: true
 ---
 
-# Dynamic AI Coding Protocol (Global Baseline)
+# AI Coding Protocol
 
-## Goal
+This file is a small guardrail layer. Workflow routing lives in `matt-skills-core.mdc`; project-specific conventions live in project `AGENTS.md`, `CLAUDE.md`, `CONTEXT.md`, `docs/adr/`, or generated `.agent-context/*`.
 
-Provide a portable behavioral protocol for AI coding in any project:
+These guardrails must not override Matt Pocock skills. If a selected Matt skill
+defines a workflow, sequence, feedback loop, or vocabulary, follow the skill
+verbatim and apply this protocol only as a safety layer.
 
-- learn local conventions before editing;
-- make the smallest effective change;
-- keep code maintainable for humans.
-
-## Non‑negotiable Rules
+## Non-Negotiable Rules
 
 1. **Smallest Effective Change**
    - Prefer the minimum diff that solves the request.
    - Do not refactor unrelated code unless explicitly asked.
 
 2. **Read Before Write**
-   - Before editing a module, read 2–3 nearby files in the same directory to learn local style.
+   - Before editing a module, read nearby code or project docs to infer local conventions.
+   - If `.agent-context/conventions.md` or `.cursor/rules/learned-conventions.mdc` exists, use it as the first convention source.
 
-3. **Check Before Creating**
-   - Search for existing helpers/patterns before adding abstractions or new files.
-   - Reuse existing utilities whenever practical.
+3. **Reuse Before Inventing**
+   - Before creating a new utility, helper, component, module, or abstraction, search for existing equivalents.
+   - Reuse or deepen existing modules when that keeps behavior behind a clearer interface.
 
-4. **Diff Self‑Review**
-   - Before reporting completion, inspect the diff and remove unrelated edits.
+4. **Behavior Over Internals**
+   - Tests should verify observable behavior through public interfaces.
+   - Mock system boundaries when necessary; avoid mocking internal collaborators you control.
 
-5. **Human Maintainability First**
+5. **Evidence Before Completion**
+   - Run relevant verification before claiming completion.
+   - If a check cannot run, state exactly what was not verified.
+
+6. **Human Maintainability First**
    - Keep names explicit and logic straightforward.
-   - Comments explain **why**, not obvious **what**.
+   - Comments explain why, not trivial what.
+   - Avoid pass-through wrappers, speculative abstractions, and broad rewrites.
 
-6. **Safety Baseline**
-   - Never hardcode secrets/keys/tokens/credentials.
-   - Never commit credential files unless the user explicitly asks.
+7. **Safety Baseline**
+   - Never hardcode secrets, keys, or tokens.
+   - Never commit credential files unless the user explicitly requests it.
+   - Before committing, separate current-session changes from pre-existing unrelated changes.
 
-## Read‑Before‑Write Protocol (Executable)
+## Local Domain Escalations
 
-When writing or modifying code, run this sequence:
+Use local plugins only when the task specifically needs them:
 
-1. **Check learned conventions first**
-   - If `learned-conventions.mdc` or `.agent-context/conventions.md` exists, use its extracted guidance and **skip manual sampling**.
-
-2. **Sample** (only if no learned conventions exist)
-   - Read 2–3 nearby files in the target module.
-
-3. **Extract** (only if no learned conventions exist)
-   - Derive conventions: naming, imports, typing density, error handling, logging, test style.
-
-4. **Align**
-   - Follow dominant local style (frequency first, recency as a tie‑breaker).
-
-5. **Verify**
-   - Compare new code against sampled style and fix obvious mismatches.
-
-## Anti‑Slop Guardrails
-
-- Avoid adding abstraction layers with only one implementation.
-- Avoid repetitive defensive checks across multiple layers for the same input.
-- Avoid utility wrappers that add no behavior.
-- Avoid broad rewrites when one focused patch is enough.
-
-## Cross‑Editor Hint
-
-If the project provides `AGENTS.md` / `CLAUDE.md` / `.agent-context/*` or `learned-conventions.mdc`, treat them as the authoritative **project-local** conventions. This file remains a behavioral baseline.
-
+- `safe-commit` for commits and Chinese commit messages.
+- `community-solution-research` for external/community solution research.
+- `design-impl-audit` for design-vs-implementation acceptance checks.
+- `dynamic-agent-context` when installing or refreshing project convention baselines.
+- `mergeable-feature-dev` for new modules or cross-module refactors that must stay easy to merge.
+- `prompt-engineering`, `frontend-design`, and other project-approved domain plugins for their narrow domains.

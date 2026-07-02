@@ -85,7 +85,7 @@ Topic: Microservices vs Monolithic Architecture
 
 ### System Architect
 **Judgment**: Recommend microservices architecture
-**Reasoning**: 
+**Reasoning**:
 - Independent deployment of modules, reduced coupling
 - Teams can develop in parallel
 - Easy to scale in the future
